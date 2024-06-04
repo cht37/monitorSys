@@ -1,4 +1,4 @@
-package com.neu.monitorSys.auth.entity;
+package com.neu.monitorSys.gateway.entity;
 
 import lombok.Getter;
 

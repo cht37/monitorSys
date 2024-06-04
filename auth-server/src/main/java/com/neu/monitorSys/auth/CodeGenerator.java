@@ -10,7 +10,7 @@ public class CodeGenerator {
     }
     private  static void generate() throws IOException {
         File directory = new File("");
-        String courseFile = "F:\\documents\\Work\\monitorSys\\AuthService";
+        String courseFile = "F:\\documents\\Work\\monitorSys\\MemberService";
 
 //            **********************必须修改的数据库连接参数**************
         String dataUrl="jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&allowMultiQueries=true";
@@ -26,7 +26,7 @@ public class CodeGenerator {
                 })
                 .packageConfig(builder -> {
                     builder.parent("com.neu.monitorSys.auth") // 设置父包名
-//                            .moduleName("AuthService") // 设置父包模块名
+//                            .moduleName("MemberService") // 设置父包模块名
                             .pathInfo(Collections.singletonMap(OutputFile.mapperXml, courseFile+"\\src\\main\\resources\\com\\neu\\monitorSys\\auth\\mapper")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {

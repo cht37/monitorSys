@@ -1,4 +1,4 @@
-package cn.edu.neu.mgzmsys.common.utils;
+package com.neu.monitorSys.auth.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;

@@ -20,6 +20,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper,Member> implemen
     }
     @Override
     public Member saveMember(Member member) {
-        return null;
+        memberMapper.insert(member);
+        return member;
     }
 }

@@ -1,0 +1,39 @@
+server:
+  port: 8002
+auth:
+  white-list:
+    - /auth/login
+    - /auth/logout
+    - /auth/register
+#    - /auth/refresh
+#    - /auth/verify
+spring:
+  application:
+    name: gateway
+  data:
+    redis:
+      host: 192.168.92.129
+      port: 6379
+      timeout: 1800000
+      password: cht021125
+  main:
+    web-application-type: reactive
+  cloud:
+    nacos:
+      discovery: #启用 spring cloud nacos discovery
+        server-addr: 192.168.92.129:8848
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 360000

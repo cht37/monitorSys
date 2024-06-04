@@ -1,4 +1,4 @@
-package com.neu.monitorSys.auth.utils;
+package com.neu.monitorSys.gateway.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;

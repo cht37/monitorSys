@@ -1,2 +1,38 @@
-package com.neu.monitorSys.auth.service.impl;public class JwtService {
+package com.neu.monitorSys.auth.service.impl;
+
+import com.neu.monitorSys.auth.utils.JwtUtil;
+import com.neu.monitorSys.auth.utils.RedisUtil;
+import com.nimbusds.jose.JOSEException;
+import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+
+import static com.neu.monitorSys.auth.utils.JwtUtil.decode;
+
+@Service
+public class JwtService {
+    @Autowired
+    private JwtUtil jwtUtil;
+     @Autowired
+    private RedisUtil redisUtil;
+    public String createToken(String username) throws JOSEException {
+        String token=JwtUtil.createToken(username);
+        //加入redis
+        redisUtil.set("Tokens:"+token,username,1000 * 60 * 60 * 2);
+        return token;
+    }
+    public boolean validateToken(String token) throws ParseException, JOSEException {
+        //验证token
+        if (!decode(token)) {
+            return false;
+        }
+        //验证token是否在redis中
+        return redisUtil.hasKey("Tokens:" + token);
+
+
+    }
 }

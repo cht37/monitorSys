@@ -6,11 +6,12 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
-
+@Component
 public class JwtUtil {
 
 //     毫秒
@@ -21,7 +22,7 @@ public class JwtUtil {
     /**
      * 创建Token
      */
-       public static String createToken(String username, String uid) throws JOSEException {
+       public static String createToken(String username) throws JOSEException {
         // 当前时间
         Date now = new Date();
 
@@ -30,8 +31,8 @@ public class JwtUtil {
 
         // 创建JWT的声明
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("username", username)
-                .claim("uid", uid)
+                .claim("logId", username)
+//                .claim("uid", uid) 不使用uid，使用时在实参中添加
                 .issueTime(now)
                 .expirationTime(expDate)
                 .build();
@@ -66,17 +67,17 @@ public class JwtUtil {
     }
 
     /**
-     * 根据jwt 获取其中id
+     * 根据jwt 获取其中id，在这里uid未启用，该方法弃用
      * @param jwt
      * @return
      */
-    public static String getUidFromToken(String jwt) throws ParseException {
-        //parse() 把字符串转成一个对象,并解密
-        JWSObject jwsObject=JWSObject.parse(jwt);
-        Payload payload=jwsObject.getPayload();
-        Map<String,Object> map=payload.toJSONObject();
-        return (String) map.get("uid");
-    }
+//    public static String getUidFromToken(String jwt) throws ParseException {
+//        //parse() 把字符串转成一个对象,并解密
+//        JWSObject jwsObject=JWSObject.parse(jwt);
+//        Payload payload=jwsObject.getPayload();
+//        Map<String,Object> map=payload.toJSONObject();
+//        return (String) map.get("uid");
+//    }
      /**
      * 根据jwt 获取其中载荷部分
      * @param jwt

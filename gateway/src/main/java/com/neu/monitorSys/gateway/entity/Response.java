@@ -1,4 +1,4 @@
-package com.neu.monitorSys.auth.entity;
+package com.neu.monitorSys.gateway.entity;
 
 public class Response<T> {
 	// 状态码

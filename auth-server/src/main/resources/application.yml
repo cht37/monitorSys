@@ -1,5 +1,6 @@
 server:
   port: 8001
+
 spring:
   application:
     name: auth-service #服务名
@@ -15,6 +16,12 @@ spring:
     nacos:
       discovery: #启用 spring cloud nacos discovery
         server-addr: 192.168.92.129:8848
+  data:
+    redis:
+      host: 192.168.92.129
+      port: 6379
+      timeout: 1800000
+      password: cht021125
 
 
 #mybatis:

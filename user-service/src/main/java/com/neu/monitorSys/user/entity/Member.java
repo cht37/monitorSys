@@ -64,5 +64,15 @@ import lombok.Setter;
      */
       private Integer state;
 
-
+//  public Member(String mnane, String logid, String tel, String gender, LocalDate birthday) {
+//    id= null;
+//    logpwd=null;
+//    roleid=null;
+//    state=null;
+//    this.mnane = mnane;
+//    this.logid = logid;
+//    this.tel = tel;
+//    this.gender = gender;
+//    this.birthday = birthday;
+//  }
 }

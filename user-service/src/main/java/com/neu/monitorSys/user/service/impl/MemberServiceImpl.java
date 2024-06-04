@@ -1,6 +1,7 @@
 package com.neu.monitorSys.user.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.neu.monitorSys.user.entity.Member;
 import com.neu.monitorSys.user.DTO.MemberWithRole;
 import com.neu.monitorSys.user.mapper.MemberMapper;
@@ -25,8 +26,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         private MemberMapper memberMapper;
         @Resource
         private RedisUtil redisUtil;
-        @Resource
-        private UserRedisPrefix userRedisPrefix;
 
 
         @Override
@@ -43,7 +42,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 //如果redis中没有用户信息，则从数据库中获取
                 memberWithRole = memberMapper.selectMemberWithRole(logId);
                 //将用户信息存入redis，有效期为5小时
-                redisUtil.set(UserRedisPrefix.USER_PREFIX +logId, memberWithRole, 60*60*5);
+                redisUtil.set(UserRedisPrefix.USER_PREFIX +logId, JSONUtil.toJsonStr(memberWithRole), 60*60*5);
             }
             return memberWithRole;
         }

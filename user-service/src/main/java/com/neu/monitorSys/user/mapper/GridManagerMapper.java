@@ -2,6 +2,7 @@ package com.neu.monitorSys.user.mapper;
 
 import com.neu.monitorSys.user.entity.GridManager;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author chen hua teng
  * @since 2024-06-04
  */
+@Mapper
 public interface GridManagerMapper extends BaseMapper<GridManager> {
 
 }

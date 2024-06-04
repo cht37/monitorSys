@@ -5,7 +5,7 @@
         <result column="role_name" property="roleName"/>
         <!--       member对象-->
         <association property="member" javaType="com.neu.monitorSys.user.entity.Member">
-            <id column="logid" property="logid"/>
+            <result column="logid" property="logid"/>
             <result column="mname" property="mnane"/>
             <result column="birthday" property="birthday"/>
             <result column="gender" property="gender"/>
@@ -13,7 +13,8 @@
         </association>
     </resultMap>
 
-    <select id="selectMemberWithRole" resultType="com.neu.monitorSys.user.DTO.MemberWithRole">
+
+    <select id="selectMemberWithRole" resultType="com.neu.monitorSys.user.DTO.MemberWithRole" resultMap="memberWithRole">
         select m.mnane,
                m.logid,
                m.birthday,

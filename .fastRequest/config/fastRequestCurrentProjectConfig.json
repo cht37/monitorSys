@@ -24,6 +24,15 @@
 				}
 			],
 			"name":"auth-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8080"
+				}
+			],
+			"name":"user-service"
 		}
 	],
 	"envList":[
@@ -38,7 +47,8 @@
 	"preScript":"",
 	"projectList":[
 		"monitorSys",
-		"auth-server"
+		"auth-server",
+		"user-service"
 	],
 	"syncModel":{
 		"branch":"master",

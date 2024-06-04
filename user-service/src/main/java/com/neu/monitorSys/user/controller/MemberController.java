@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2024-06-04
  */
 @RestController
-@RequestMapping("//member")
+@RequestMapping("/member")
 public class MemberController {
     @Autowired
     private IMemberService memberService;

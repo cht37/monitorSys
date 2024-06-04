@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="fastRequestCurrentParamGroup">
+    <option name="bodyParamMap">
+      <map>
+        <entry key="member">
+          <value>
+            <Object />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="className" value="com.neu.monitorSys.auth.controller.AuthController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/auth-server/AuthController~createUser.rapi" />
+    <option name="method" value="createUser" />
+    <option name="methodType" value="POST" />
+    <option name="module" value="auth-server" />
+    <option name="originUrl" value="/auth/register" />
+    <option name="responseParamMap">
+      <map>
+        <entry key="return">
+          <value>
+            <Object />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="returnDocument" value="{&quot;status&quot;:{},&quot;body&quot;:{}}" />
+    <option name="tempId" value="" />
+    <option name="url" value="/auth/register" />
+  </component>
+</project>

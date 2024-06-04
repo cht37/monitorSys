@@ -11,6 +11,7 @@
     <modules>
         <module>auth-server</module>
         <module>gateway</module>
+        <module>user-service</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -33,12 +34,6 @@
                 <!--导出到子工程-->
                 <scope>import</scope>
             </dependency>
-            <!--lombok        -->
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.20</version>
-            </dependency>
             <!--mybatis        -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
@@ -50,7 +45,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <scope>runtime</scope>
-                <version>8.0.27</version>
+                <version>8.0.28</version>
             </dependency>
             <!--mybatis-plus        -->
             <dependency>
@@ -93,6 +88,12 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <!--lombok        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+        </dependency>
         <!-- Nacos 服务发现 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

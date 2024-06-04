@@ -1,11 +1,9 @@
 package com.neu.monitorSys.auth.service.impl;
 
 import com.neu.monitorSys.auth.utils.JwtUtil;
+import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.utils.RedisUtil;
 import com.nimbusds.jose.JOSEException;
-import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,7 @@ public class JwtService {
     public String createToken(String username) throws JOSEException {
         String token=JwtUtil.createToken(username);
         //加入redis
-        redisUtil.set("Tokens:"+token,username,1000 * 60 * 60 * 2);
+        redisUtil.set(AuthRedisPrefix.AUTH_PREFIX +token,username, 60 * 60 * 2);
         return token;
     }
     public boolean validateToken(String token) throws ParseException, JOSEException {

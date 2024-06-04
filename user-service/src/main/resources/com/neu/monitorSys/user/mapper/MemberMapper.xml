@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.monitorSys.user.mapper.MemberMapper">
+    <resultMap id="memberWithRole" type="com.neu.monitorSys.user.DTO.MemberWithRole">
+        <result column="role_name" property="roleName"/>
+        <!--       member对象-->
+        <association property="member" javaType="com.neu.monitorSys.user.entity.Member">
+            <id column="logid" property="logid"/>
+            <result column="mname" property="mnane"/>
+            <result column="birthday" property="birthday"/>
+            <result column="gender" property="gender"/>
+            <result column="tel" property="tel"/>
+        </association>
+    </resultMap>
+
+    <select id="selectMemberWithRole" resultType="com.neu.monitorSys.user.DTO.MemberWithRole">
+        select m.mnane,
+               m.logid,
+               m.birthday,
+               m.gender,
+               m.tel,
+               r.mname as role_name
+        from member m
+                 left join roles r on m.roleid = r.id
+        where m.logid = #{logid}
+    </select>
+</mapper>

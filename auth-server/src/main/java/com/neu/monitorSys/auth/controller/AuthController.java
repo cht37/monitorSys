@@ -1,8 +1,8 @@
 package com.neu.monitorSys.auth.controller;
-import com.neu.monitorSys.auth.entity.AuthRequest;
+import com.neu.monitorSys.auth.DTO.AuthRequest;
 import com.neu.monitorSys.auth.entity.Member;
-import com.neu.monitorSys.auth.entity.Response;
-import com.neu.monitorSys.auth.entity.ResultCode;
+import com.neu.monitorSys.auth.DTO.MyResponse;
+import com.neu.monitorSys.auth.constants.ResultCode;
 import com.neu.monitorSys.auth.service.MemberService;
 import com.neu.monitorSys.auth.service.impl.JwtService;
 import com.nimbusds.jose.JOSEException;
@@ -39,21 +39,21 @@ public class AuthController {
     }
 
     @PostMapping(value = "/token")
-    public Response<String> generateToken(@RequestBody AuthRequest authRequest) throws JOSEException {
+    public MyResponse<String> generateToken(@RequestBody AuthRequest authRequest) throws JOSEException {
         final Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getLogId(), authRequest.getLogPwd()));
         if (authenticate.isAuthenticated()) {
             final String token = jwtService.createToken(authRequest.getLogId());
-            return new Response<>(ResultCode.SUCCESS.getCode(), token, "success");
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), token, "success");
         } else {
-            return new Response<>(ResultCode.FAILED.getCode(), null, "failed");
+            return new MyResponse<>(ResultCode.FAILED.getCode(), null, "failed");
         }
     }
 
     @GetMapping(value = "/validate")
-    public Response<String> validateToken(@RequestParam String token) throws ParseException, JOSEException {
+    public MyResponse<String> validateToken(@RequestParam String token) throws ParseException, JOSEException {
         if (!jwtService.validateToken(token)) {
-            return new Response<>(ResultCode.FAILED.getCode(), null, "Token is invalid");
+            return new MyResponse<>(ResultCode.FAILED.getCode(), null, "Token is invalid");
         }
-        return new Response<>(ResultCode.SUCCESS.getCode(), null, "Token is valid");
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), null, "Token is valid");
     }
 }

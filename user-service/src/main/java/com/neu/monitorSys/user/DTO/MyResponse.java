@@ -1,6 +1,6 @@
-package com.neu.monitorSys.auth.entity;
+package com.neu.monitorSys.user.DTO;
 
-public class Response<T> {
+public class MyResponse<T> {
 	// 状态码
     private int statusCode;
     // 响应信息提示
@@ -9,7 +9,7 @@ public class Response<T> {
     private T data;
 
     // 构造函数
-    public Response(int statusCode, String message, T data) {
+    public MyResponse(int statusCode, String message, T data) {
         this.statusCode = statusCode;
         this.message = message;
         this.data = data;

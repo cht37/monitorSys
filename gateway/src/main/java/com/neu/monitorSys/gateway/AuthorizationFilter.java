@@ -2,7 +2,7 @@ package com.neu.monitorSys.gateway;
 
 import cn.hutool.core.util.StrUtil;
 import com.neu.monitorSys.gateway.config.AuthConfig;
-import com.neu.monitorSys.gateway.entity.ResultCode;
+import com.neu.monitorSys.gateway.constants.ResultCode;
 import com.neu.monitorSys.gateway.util.RedisUtil;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import jakarta.annotation.Resource;

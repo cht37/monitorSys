@@ -49,6 +49,13 @@ public class AuthController {
         }
     }
 
+    /**
+     * 校验token有效性
+     * @param token
+     * @return
+     * @throws ParseException
+     * @throws JOSEException
+     */
     @GetMapping(value = "/validate")
     public MyResponse<String> validateToken(@RequestParam String token) throws ParseException, JOSEException {
         if (!jwtService.validateToken(token)) {

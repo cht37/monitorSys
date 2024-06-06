@@ -1,6 +1,7 @@
 package com.neu.monitorSys.gateway;
 
 import cn.hutool.core.util.StrUtil;
+import com.neu.monitorSys.gateway.DTO.Response;
 import com.neu.monitorSys.gateway.config.AuthConfig;
 import com.neu.monitorSys.gateway.constants.ResultCode;
 import com.neu.monitorSys.gateway.util.RedisUtil;
@@ -65,7 +66,8 @@ public class AuthorizationFilter implements GlobalFilter {
         //判断传递了token才可以继续解析
         if (!StrUtil.isEmpty(token)) {
             //调用auth-server的验证接口
-            val result = feignAuthClient.validate(token);
+
+            Response<String> result = feignAuthClient.validate(token);
             if (result.getStatusCode() == ResultCode.SUCCESS.getCode()) {
                 return chain.filter(exchange);
             } else {

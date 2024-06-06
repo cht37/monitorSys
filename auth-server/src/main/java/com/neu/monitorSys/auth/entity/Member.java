@@ -28,7 +28,7 @@ import lombok.Setter;
       /**
      * 人员真实姓名，
      */
-      private String mnane;
+      private String mname;
 
       /**
      * 登录名

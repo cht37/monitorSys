@@ -6,7 +6,7 @@
         <!--       member对象-->
         <association property="member" javaType="com.neu.monitorSys.user.entity.Member">
             <result column="logid" property="logid"/>
-            <result column="mname" property="mnane"/>
+            <result column="mname" property="mname"/>
             <result column="birthday" property="birthday"/>
             <result column="gender" property="gender"/>
             <result column="tel" property="tel"/>
@@ -15,11 +15,12 @@
 
 
     <select id="selectMemberWithRole" resultType="com.neu.monitorSys.user.DTO.MemberWithRole" resultMap="memberWithRole">
-        select m.mnane,
+        select m.mname,
                m.logid,
                m.birthday,
                m.gender,
                m.tel,
+               m.state,
                r.mname as role_name
         from member m
                  left join roles r on m.roleid = r.id

@@ -29,9 +29,9 @@ public class GridManager implements Serializable {
       private Integer gmId;
 
       /**
-     * 成员id
+     * 成员logid
      */
-      private Integer memberId;
+      private String memberId;
 
       /**
      * 所负责区域id

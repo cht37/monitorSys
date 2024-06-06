@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="fastRequestCurrentParamGroup">
-    <option name="clasDescription" value="&lt;p&gt; 用户表&#9; 前端控制器 &lt;/p&gt;" />
-    <option name="className" value="com.neu.monitorSys.user.controller.MemberController" />
-    <option name="filePath" value="/.fastRequest/collections/Root/user-service/MemberController~getMemberInfo.rapi" />
-    <option name="method" value="getMemberInfo" />
-    <option name="methodDescription" value="获取用户基本信息" />
-    <option name="module" value="user-service" />
-    <option name="originUrl" value="/member/getMemberInfo/{logId}" />
-    <option name="pathParamMap">
+    <option name="bodyParamMap">
       <map>
-        <entry key="logId">
+        <entry key="gridManagerDTO">
+          <value>
+            <Object />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="clasDescription" value="&lt;p&gt; 网格员表 前端控制器 &lt;/p&gt;" />
+    <option name="className" value="com.neu.monitorSys.user.controller.GridManagerController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/user-service/GridManagerController~searchGridManagers.rapi" />
+    <option name="method" value="searchGridManagers" />
+    <option name="methodDescription" value="多条件查询网格员信息" />
+    <option name="module" value="user-service" />
+    <option name="originUrl" value="/gridManager/search" />
+    <option name="requestParamMap">
+      <map>
+        <entry key="page">
+          <value>
+            <Object />
+          </value>
+        </entry>
+        <entry key="size">
           <value>
             <Object />
           </value>
@@ -26,8 +40,8 @@
         </entry>
       </map>
     </option>
-    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;member&quot;:{&quot;id&quot;:&quot;No comment,Type =Number&quot;,&quot;mnane&quot;:&quot;人员真实姓名，&quot;,&quot;logid&quot;:&quot;登录名&quot;,&quot;logpwd&quot;:&quot;登录密码&quot;,&quot;tel&quot;:&quot;手机号&quot;,&quot;gender&quot;:&quot;性别&quot;,&quot;birthday&quot;:&quot;生日&quot;,&quot;roleid&quot;:&quot;角色编码&quot;,&quot;state&quot;:&quot;人员状态，\t默认为0: 未指派\t1：已指派身份&quot;},&quot;roleName&quot;:&quot;No comment,Type =String&quot;}}" />
-    <option name="tempId" value="" />
-    <option name="url" value="/member/getMemberInfo/logId_znklo" />
+    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
+    <option name="tempId" value="api_com.neu.monitorSys.user.controller.GridManagerController.searchGridManagers" />
+    <option name="url" value="/gridManager/getGridManagerInfo/logId_fam0j" />
   </component>
 </project>

@@ -37,3 +37,5 @@ spring:
               - "*"
             allowCredentials: true
             maxAge: 360000
+      routes:
+

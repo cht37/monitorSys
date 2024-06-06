@@ -1,6 +1,8 @@
 package com.neu.monitorSys.user.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -17,7 +19,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-  public class Member implements Serializable {
+public class Member implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +29,7 @@ import lombok.Setter;
       /**
      * 人员真实姓名，
      */
-      private String mnane;
+      private String mname;
 
       /**
      * 登录名
@@ -60,19 +62,8 @@ import lombok.Setter;
       private Integer roleid;
 
       /**
-     * 人员状态，	默认为0: 未指派	1：已指派身份
+     * 人员状态，	默认为0: 未授权	1：已授权  2：禁用
      */
       private Integer state;
 
-//  public Member(String mnane, String logid, String tel, String gender, LocalDate birthday) {
-//    id= null;
-//    logpwd=null;
-//    roleid=null;
-//    state=null;
-//    this.mnane = mnane;
-//    this.logid = logid;
-//    this.tel = tel;
-//    this.gender = gender;
-//    this.birthday = birthday;
-//  }
 }

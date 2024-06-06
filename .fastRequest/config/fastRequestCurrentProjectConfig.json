@@ -20,7 +20,11 @@
 			"hostGroup":[
 				{
 					"env":"local",
-					"url":"http://localhost:8080"
+					"url":"http://localhost:8001"
+				},
+				{
+					"env":"test",
+					"url":"http://localhost:8001"
 				}
 			],
 			"name":"auth-server"
@@ -29,7 +33,11 @@
 			"hostGroup":[
 				{
 					"env":"local",
-					"url":"http://localhost:8080"
+					"url":"http://localhost:8003"
+				},
+				{
+					"env":"test",
+					"url":"http://localhost:8003"
 				}
 			],
 			"name":"user-service"

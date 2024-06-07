@@ -7,7 +7,7 @@
 	"description":"",
 	"directory":"/.fastRequest/collections/Root/user-service/GridManagerController",
 	"domain":"http://localhost:8003",
-	"enableEnv":"test",
+	"enableEnv":"local",
 	"enableProject":"user-service",
 	"filePath":"/.fastRequest/collections/Root/user-service/GridManagerController~searchGridManagers.rapi",
 	"id":"api_com.neu.monitorSys.user.controller.GridManagerController.searchGridManagers",

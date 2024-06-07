@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="fastRequestHistoryConfig">
+    <option name="historyList">
+      <list>
+        <ResponseHistory>
+          <option name="className" value="com.neu.monitorSys.roleManage.controller.RolesController" />
+          <option name="enableEnv" value="local" />
+          <option name="enableProject" value="role-server" />
+          <option name="method" value="addRole" />
+          <option name="methodType" value="GET" />
+          <option name="name" value="新增角色" />
+          <option name="paramGroup">
+            <ParamGroupCollection>
+              <option name="className" value="com.neu.monitorSys.roleManage.controller.RolesController" />
+              <option name="method" value="addRole" />
+              <option name="methodDescription" value="新增角色" />
+              <option name="multipartKeyValueListJson" value="[]" />
+              <option name="originUrl" value="/roles/addRole" />
+              <option name="pathParamsKeyValueListJson" value="[]" />
+              <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;java.lang.Boolean&quot;:&quot;No comment,Type =Boolean&quot;}}" />
+              <option name="url" value="/roles/addRole" />
+              <option name="urlEncodedKeyValueListJson" value="[]" />
+              <option name="urlParamsKeyValueListJson" value="[]" />
+            </ParamGroupCollection>
+          </option>
+          <option name="requestInfo" value="Request Url: http://localhost:8080/roles/addRole&#13;&#10;Request Headers: &#13;&#10;    Accept: application/json,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#13;&#10;    User-Agent: Fast Request/2024.1.5.1&#13;&#10;    Accept-Encoding: gzip, deflate&#13;&#10;Request Body: &#13;&#10;    null&#13;&#10;" />
+          <option name="response" value="ConnectException: Connection refused: no further information" />
+          <option name="url" value="/roles/addRole" />
+        </ResponseHistory>
+      </list>
+    </option>
+  </component>
+</project>

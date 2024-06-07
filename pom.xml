@@ -11,7 +11,9 @@
     <modules>
         <module>auth-server</module>
         <module>gateway</module>
-        <module>user-service</module>
+        <module>user-server</module>
+        <module>flink-server</module>
+        <module>role-server</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

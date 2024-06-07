@@ -1,9 +1,9 @@
 server:
-  port: 8001
+  port: 8003
 
 spring:
   application:
-    name: auth-service #服务名
+    name: user-server #服务名
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver #数据库驱动包
     url: jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
@@ -24,14 +24,8 @@ spring:
       password: cht021125
 
 
-#mybatis:
-#  mapper-locations: classpath:mapper/*.xml
-#  type-aliases-package: com.neu.monitorSys.auth.entity  #所有entity别名所在包
-
-
-
 mybatis-plus:
-  type-aliases-package: com.neu.monitorSys.auth.entity
+  type-aliases-package: com.neu.monitorSys.user.entity
   configuration:
     call-setters-on-nulls: false
     map-underscore-to-camel-case: true

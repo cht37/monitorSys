@@ -2,14 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.neu.monitorSys.user.mapper.MemberMapper">
     <resultMap id="memberWithRole" type="com.neu.monitorSys.user.DTO.MemberWithRole">
-        <result column="role_name" property="roleName"/>
         <!--       member对象-->
+
         <association property="member" javaType="com.neu.monitorSys.user.entity.Member">
             <result column="logid" property="logid"/>
             <result column="mname" property="mname"/>
             <result column="birthday" property="birthday"/>
             <result column="gender" property="gender"/>
             <result column="tel" property="tel"/>
+        </association>
+        <association property="roles" javaType="com.neu.monitorSys.user.entity.Roles">
+            <id column="role_id" property="id" javaType="java.lang.Integer" />
+            <result column="role_name" property="mname"/>
+            <result column="description" property="remark"/>
         </association>
     </resultMap>
 
@@ -21,7 +26,9 @@
                m.gender,
                m.tel,
                m.state,
-               r.mname as role_name
+               r.id as role_id,
+               r.mname as role_name,
+               r.remark as description
         from member m
                  left join roles r on m.roleid = r.id
         where m.logid = #{logid}

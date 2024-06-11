@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="fastRequestCurrentParamGroup">
-    <option name="className" value="com.neu.monitorSys.roleManage.client.UserClient" />
-    <option name="filePath" value="" />
-    <option name="method" value="updateMemberInfo" />
-    <option name="module" value="role-server" />
-    <option name="originUrl" value="/member/updateMemberInfo" />
+    <option name="clasDescription" value="&lt;p&gt; grid_manager_area表前端控制器 &lt;/p&gt;" />
+    <option name="className" value="com.neu.monitorSys.geography.controller.GridManagerAreaController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/geography-server/GridManagerAreaController~getAreDetailById.rapi" />
+    <option name="method" value="getAreDetailById" />
+    <option name="methodDescription" value="根据Id获取管理区域信息" />
+    <option name="module" value="geography-server" />
+    <option name="originUrl" value="/area/getGeoInfo/{id}" />
+    <option name="pathParamMap">
+      <map>
+        <entry key="id">
+          <value>
+            <Object />
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="responseParamMap">
       <map>
         <entry key="return">
@@ -15,8 +26,8 @@
         </entry>
       </map>
     </option>
-    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;java.lang.Boolean&quot;:&quot;No comment,Type =Boolean&quot;}}" />
-    <option name="tempId" value="api_com.neu.monitorSys.roleManage.controller.RolesController.addRole" />
-    <option name="url" value="/member/updateMemberInfo" />
+    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;areaName&quot;:&quot;No comment,Type =String&quot;,&quot;cityName&quot;:&quot;No comment,Type =String&quot;,&quot;provinceName&quot;:&quot;No comment,Type =String&quot;}}" />
+    <option name="tempId" value="" />
+    <option name="url" value="/provinces/getProvinceId/provinceName_v6hig" />
   </component>
 </project>

@@ -14,7 +14,8 @@ public class MyResponse<T> {
         this.message = message;
         this.data = data;
     }
-
+     // 无参构造函数
+    public MyResponse() {}
     // Getter和Setter方法
 
     // 状态码

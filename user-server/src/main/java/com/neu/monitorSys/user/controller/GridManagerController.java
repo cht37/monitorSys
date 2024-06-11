@@ -2,7 +2,7 @@ package com.neu.monitorSys.user.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.neu.monitorSys.user.DTO.GridManagerDTO;
+import com.neu.monitorSys.user.DTO.GridManagerFullDTO;
 import com.neu.monitorSys.user.DTO.MyResponse;
 import com.neu.monitorSys.user.constants.ResultCode;
 import com.neu.monitorSys.user.entity.GridManager;
@@ -41,21 +41,21 @@ public class GridManagerController {
     /**
      * 多条件查询网格员信息
      *
-     * @param gridManagerDTO
+     * @param gridManagerFullDTO
      * @param page
      * @param size
      * @return
      */
     @PostMapping("/search")
-    public MyResponse<IPage<GridManagerDTO>> searchGridManagers(
-            @RequestBody(required = false) GridManagerDTO gridManagerDTO,
+    public MyResponse<IPage<GridManagerFullDTO>> searchGridManagers(
+            @RequestBody(required = false) GridManagerFullDTO gridManagerFullDTO,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         try {
-            if (gridManagerDTO == null) {
-                gridManagerDTO = new GridManagerDTO();
+            if (gridManagerFullDTO == null) {
+                gridManagerFullDTO = new GridManagerFullDTO();
             }
-            IPage<GridManagerDTO> gridManagerDTOIPage = gridManagerService.findGridManagersByConditions(gridManagerDTO, page, size);
+            IPage<GridManagerFullDTO> gridManagerDTOIPage = gridManagerService.findGridManagersByConditions(gridManagerFullDTO, page, size);
             return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", gridManagerDTOIPage);
         } catch (Exception e) {
             return new MyResponse<>(ResultCode.FAILED.getCode(), "查询失败", null);

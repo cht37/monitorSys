@@ -75,4 +75,10 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
         }
         return false;
     }
+
+    @Override
+    public Roles getRoleById(Integer roleId) {
+        //从数据库查询角色信息
+        return rolesMapper.selectById(roleId);
+    }
 }

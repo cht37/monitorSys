@@ -18,9 +18,14 @@ public class JwtService {
      @Autowired
     private RedisUtil redisUtil;
     public String createToken(String username) throws JOSEException {
-        String token=JwtUtil.createToken(username);
-        //加入redis
-        redisUtil.set(AuthRedisPrefix.AUTH_PREFIX +token,username, 60 * 60 * 2);
+        String token= null;
+        if (!redisUtil.hasKey(AuthRedisPrefix.AUTH_PREFIX +username)) {
+            token = JwtUtil.createToken(username);
+            //加入redis
+            redisUtil.set(AuthRedisPrefix.AUTH_PREFIX +username,token, 60 * 60 * 2);
+        }else {
+            token = (String) redisUtil.get(AuthRedisPrefix.AUTH_PREFIX +username);
+        }
         return token;
     }
     public boolean validateToken(String token) throws ParseException, JOSEException {

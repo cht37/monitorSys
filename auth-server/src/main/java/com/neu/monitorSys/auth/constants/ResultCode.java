@@ -6,19 +6,27 @@ import lombok.Getter;
 @Getter
 public enum ResultCode {
 
-    SUCCESS(1000, "操作成功"),
+    SUCCESS(200, "操作成功"),
 
-    FAILED(1001, "响应失败"),
+    BAD_REQUEST(400, "请求参数错误"),
 
-    VALIDATE_FAILED(1002, "参数校验失败"),
+    UNAUTHORIZED(401, "未授权"),
 
-    NO_RESULT(1003, "未查询到相关信息"),
+    FORBIDDEN(403, "禁止访问"),
 
-    MES_ERROR(1004, "未查询到相关信息"),
+    NOT_FOUND(404, "未找到资源"),
 
-    ERROR(5000, "未知错误"),
+    VALIDATE_FAILED(422, "参数校验失败"),
 
-    FILE_UPLOAD_ERROR(5001, "文件上传失败");
+    SERVER_ERROR(500, "服务器内部错误"),
+
+    NO_RESULT(204, "未查询到相关信息"),
+
+    FAILED(5000, "操作失败"),
+
+    FILE_UPLOAD_ERROR(5001, "文件上传失败"),
+
+    MES_ERROR(5002, "消息处理错误");
 
 
     private int code;

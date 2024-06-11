@@ -46,7 +46,7 @@
 			"hostGroup":[
 				{
 					"env":"local",
-					"url":"http://localhost:8080"
+					"url":"http://localhost:8004"
 				}
 			],
 			"name":"role-server"
@@ -55,10 +55,19 @@
 			"hostGroup":[
 				{
 					"env":"local",
-					"url":"http://localhost:8080"
+					"url":"http://localhost:8002"
 				}
 			],
 			"name":"user-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8005"
+				}
+			],
+			"name":"geography-server"
 		}
 	],
 	"envList":[
@@ -76,7 +85,8 @@
 		"auth-server",
 		"user-service",
 		"role-server",
-		"user-server"
+		"user-server",
+		"geography-server"
 	],
 	"syncModel":{
 		"branch":"master",

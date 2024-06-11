@@ -1,5 +1,6 @@
 package com.neu.monitorSys.user.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -8,10 +9,16 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.user.DTO.GridManagerDTO;
+import com.neu.monitorSys.user.DTO.GeographyDTO;
+import com.neu.monitorSys.user.DTO.GridManagerFullDTO;
+import com.neu.monitorSys.user.DTO.MemberWithRole;
+import com.neu.monitorSys.user.DTO.MyResponse;
+import com.neu.monitorSys.user.client.GeoClient;
+import com.neu.monitorSys.user.client.RoleClient;
 import com.neu.monitorSys.user.constants.UserRedisPrefix;
 import com.neu.monitorSys.user.entity.GridManager;
 import com.neu.monitorSys.user.entity.Member;
+import com.neu.monitorSys.user.entity.Roles;
 import com.neu.monitorSys.user.mapper.GridManagerMapper;
 import com.neu.monitorSys.user.mapper.MemberMapper;
 import com.neu.monitorSys.user.service.IGridManagerService;
@@ -37,7 +44,10 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
     private GridManagerMapper gridManagerMapper;
     @Autowired
     private MemberMapper memberMapper;
-
+    @Autowired
+    private GeoClient geoClient;
+    @Autowired
+    private RoleClient roleClient;
     /**
      * 1.根据网格员memberId(logId)获取网格员信息
      */
@@ -62,7 +72,7 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
     /**
      * 多条件查询网格员信息
      */
-    public IPage<GridManagerDTO> findGridManagersByConditions(GridManagerDTO gridManagerDTO, int page, int size) {
+    public IPage<GridManagerFullDTO> findGridManagersByConditions(GridManagerFullDTO gridManagerFullDTO, int page, int size) {
         //redis实现分页+多条件查询
         /*
           首先我们可以采用多条件模糊查询章节所说的方式，将我们所涉及到的条件字段作为hash的field，
@@ -77,12 +87,12 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         //多条件查询
         LambdaQueryWrapper<GridManager> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(GridManager::getMemberId, GridManager::getAreaId, GridManager::getState, GridManager::getRemark);
-        if (gridManagerDTO.getMember() != null) {
-            queryWrapper.like(GridManager::getMemberId, gridManagerDTO.getMember().getLogid());
+        if (gridManagerFullDTO.getMemberWithRole() != null) {
+            queryWrapper.like(GridManager::getMemberId, gridManagerFullDTO.getMemberWithRole().getMember().getLogid());
         }
-        queryWrapper.eq(gridManagerDTO.getAreaId() != null, GridManager::getAreaId, gridManagerDTO.getAreaId());
-        queryWrapper.eq(gridManagerDTO.getRoleState() != null, GridManager::getState, gridManagerDTO.getRoleState());
-        queryWrapper.eq(gridManagerDTO.getRemark() != null, GridManager::getRemark, gridManagerDTO.getRemark());
+        queryWrapper.eq(gridManagerFullDTO.getAreaId() != null, GridManager::getAreaId, gridManagerFullDTO.getAreaId());
+        queryWrapper.eq(gridManagerFullDTO.getRoleState() != null, GridManager::getState, gridManagerFullDTO.getRoleState());
+        queryWrapper.eq(gridManagerFullDTO.getRemark() != null, GridManager::getRemark, gridManagerFullDTO.getRemark());
         // 创建分页对象
         Page<GridManager> gridManagerPage = new Page<>(page, size);
 
@@ -90,21 +100,27 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         IPage<GridManager> gridManagerIPage = gridManagerMapper.selectPage(gridManagerPage, queryWrapper);
 
         // 构建返回结果
-        IPage<GridManagerDTO> resultPage = new Page<>(page, size, gridManagerIPage.getTotal());
-        List<GridManagerDTO> gridManagerDTOList = gridManagerIPage.getRecords().stream().map(gridManager -> {
-            GridManagerDTO dto = new GridManagerDTO();
+        IPage<GridManagerFullDTO> resultPage = new Page<>(page, size, gridManagerIPage.getTotal());
+        List<GridManagerFullDTO> gridManagerFullDTOList = gridManagerIPage.getRecords().stream().map(gridManager -> {
+            GridManagerFullDTO dto = new GridManagerFullDTO();
             dto.setAreaId(gridManager.getAreaId());
             dto.setRoleState(gridManager.getState());
             dto.setRemark(gridManager.getRemark());
-
+            //向地理服务获取网格员的地理信息
+            Object data = geoClient.getGeoInfo(gridManager.getAreaId()).getData();
+            GeographyDTO bean = BeanUtil.toBean(data, GeographyDTO.class);
+            dto.setAreaName(bean.getAreaName());
+            dto.setCityName(bean.getCityName());
+            dto.setProvinceName(bean.getProvinceName());
             Member member = memberMapper.selectOne(new LambdaQueryWrapper<Member>().eq(Member::getLogid, gridManager.getMemberId()));
             member.setId(null);
-            dto.setMember(member);
-
+            //向角色服务获取网格员的角色信息
+            Object roleData = roleClient.getRoleById(member.getRoleid()).getData();
+            dto.setMemberWithRole(new MemberWithRole(member, BeanUtil.toBean(roleData, Roles.class)));
             return dto;
         }).toList();
 
-        resultPage.setRecords(gridManagerDTOList);
+        resultPage.setRecords(gridManagerFullDTOList);
 
 
         return resultPage;

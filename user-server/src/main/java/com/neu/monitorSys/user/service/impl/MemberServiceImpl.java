@@ -3,6 +3,7 @@ package com.neu.monitorSys.user.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neu.monitorSys.user.DTO.MemberWithRole;
@@ -57,6 +58,31 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         //将用户信息存入redis，有效期为5小时
         redisUtil.set(UserRedisPrefix.USER_PREFIX + logId, JSONUtil.toJsonStr(memberWithRole), 60 * 60 * 5);
         return memberWithRole;
+    }
+
+    @Override
+    public Member getMember(String logId, String method) {
+        LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Member::getLogid, logId);
+        Member member = memberMapper.selectOne(wrapper);
+        if(method==null||method.equals("")){
+            member.setLogpwd(null);
+            return member;
+        }else if("login".equals(method)){
+            return member;
+        }
+        throw new RuntimeException("method参数错误");
+    }
+
+    @Override
+    public Member getMemberByMobile(String mobile) {
+        LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Member::getTel, mobile);
+        Member member = memberMapper.selectOne(wrapper);
+        if (ObjectUtil.isNull(member)) {
+            throw new RuntimeException("用户不存在");
+        }
+        return member;
     }
 
 }

@@ -7,6 +7,7 @@ import com.neu.monitorSys.user.DTO.MyResponse;
 import com.neu.monitorSys.user.constants.ResultCode;
 import com.neu.monitorSys.user.entity.Member;
 import com.neu.monitorSys.user.service.IMemberService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,8 +52,33 @@ public class MemberController {
         }
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "修改用户信息成功", true);
     }
-
-
+    /**
+     * 获取用户基本信息
+     * @param logId
+     * @param method
+     * @return
+     */
+    @GetMapping("/getMember/{logId}")
+    public MyResponse<Member> getMember(@PathVariable String logId, @RequestParam(required = false) String method) {
+        Member member = memberService.getMember(logId, method);
+        if(ObjectUtil.isNull(member)){
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户信息失败", null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "获取用户信息成功", member);
+    }
+    /**
+     * 根据手机号获取用户基本信息
+     * @param mobile
+     * @return
+     */
+    @GetMapping("/getMemberByMobile/{mobile}")
+    public MyResponse<Member> getMemberByMobile(@PathVariable String mobile) {
+        Member member = memberService.getMemberByMobile(mobile);
+        if(ObjectUtil.isNull(member)){
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户信息失败", null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "获取用户信息成功", member);
+    }
 
 }
 

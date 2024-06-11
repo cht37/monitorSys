@@ -7,6 +7,10 @@
     <file url="file://$PROJECT_DIR$/flink-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/geography-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/geography-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/grid-manage-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/grid-manage-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/role-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/role-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />

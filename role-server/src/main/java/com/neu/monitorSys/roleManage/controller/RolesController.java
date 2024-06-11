@@ -6,17 +6,13 @@ import com.neu.monitorSys.roleManage.constants.ResultCode;
 import com.neu.monitorSys.roleManage.entity.Roles;
 import com.neu.monitorSys.roleManage.service.IRolesService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ * 角色表 前端控制器
  * </p>
  *
  * @author chen hua teng
@@ -73,5 +69,20 @@ public class RolesController {
         }
         return new MyResponse<>(ResultCode.FAILED.getCode(), "新增失败",false);
     }
+    /**
+     * 根据id获取角色信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/getRoleById/{id}")
+
+    MyResponse<Roles> getRoleById(@PathVariable Integer id){
+        Roles role=rolesService.getRoleById(id);
+        if (role!=null) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", role);
+        }
+        return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "未查询到角色",null);
+    }
+
 }
 

@@ -1,18 +1,23 @@
 package com.neu.monitorSys.auth.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CustomUserDetails implements UserDetails, Serializable {
+    @Serial
+    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
+    private Member member;
 
-public class CustomUserDetails implements UserDetails {
-    private String username;
-    private String password;
-
-    public CustomUserDetails(Member member) {
-        this.username = member.getLogid();
-        this.password = member.getLogpwd();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -21,12 +26,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return member.getLogpwd();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return member.getLogid();
     }
 
     @Override

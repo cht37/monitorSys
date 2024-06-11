@@ -22,4 +22,14 @@ public interface IMemberService extends IService<Member> {
      */
     MemberWithRole getMemberWithRole(String logId);
 
+    /**
+     * 获取用户基本信息
+     */
+    Member getMember(String logId,String method);
+
+    /**
+     * 根据手机号获取用户基本信息
+     */
+    Member getMemberByMobile(String mobile);
+
 }

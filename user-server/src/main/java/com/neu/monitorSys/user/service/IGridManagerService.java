@@ -1,12 +1,9 @@
 package com.neu.monitorSys.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.neu.monitorSys.user.DTO.GridManagerDTO;
+import com.neu.monitorSys.user.DTO.GridManagerFullDTO;
 import com.neu.monitorSys.user.entity.GridManager;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -25,7 +22,7 @@ public interface IGridManagerService extends IService<GridManager> {
     /**
      * 多条件查询网格员信息
      */
-    IPage<GridManagerDTO> findGridManagersByConditions(GridManagerDTO gridManagerDTO, int page, int size);
+    IPage<GridManagerFullDTO> findGridManagersByConditions(GridManagerFullDTO gridManagerFullDTO, int page, int size);
 
     /**
      * 修改网格员信息

@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="fastRequestCurrentParamGroup">
-    <option name="clasDescription" value="&lt;p&gt; grid_manager_area表前端控制器 &lt;/p&gt;" />
-    <option name="className" value="com.neu.monitorSys.geography.controller.GridManagerAreaController" />
-    <option name="filePath" value="/.fastRequest/collections/Root/geography-server/GridManagerAreaController~getAreDetailById.rapi" />
-    <option name="method" value="getAreDetailById" />
-    <option name="methodDescription" value="根据Id获取管理区域信息" />
-    <option name="module" value="geography-server" />
-    <option name="originUrl" value="/area/getGeoInfo/{id}" />
-    <option name="pathParamMap">
+    <option name="clasDescription" value="&lt;p&gt; 公众监督反馈表 前端控制器 &lt;/p&gt;" />
+    <option name="className" value="com.neu.monitorSys.feedback.controller.AqiFeedbackController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/feedback-server/AqiFeedbackController~getFeedbackByGridId.rapi" />
+    <option name="method" value="getFeedbackByGridId" />
+    <option name="methodDescription" value="根据网格id查询反馈信息（待处理的信息以及正在处理的信息）" />
+    <option name="module" value="feedback-server" />
+    <option name="originUrl" value="/api/v1/feedbacks/waiting-list" />
+    <option name="requestParamMap">
       <map>
-        <entry key="id">
+        <entry key="page">
+          <value>
+            <Object />
+          </value>
+        </entry>
+        <entry key="size">
           <value>
             <Object />
           </value>
@@ -26,8 +31,8 @@
         </entry>
       </map>
     </option>
-    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;areaName&quot;:&quot;No comment,Type =String&quot;,&quot;cityName&quot;:&quot;No comment,Type =String&quot;,&quot;provinceName&quot;:&quot;No comment,Type =String&quot;}}" />
+    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
     <option name="tempId" value="" />
-    <option name="url" value="/provinces/getProvinceId/provinceName_v6hig" />
+    <option name="url" value="/api/v1/feedbacks/waiting-list" />
   </component>
 </project>

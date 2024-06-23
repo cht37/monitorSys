@@ -15,6 +15,10 @@
         <module>flink-server</module>
         <module>role-server</module>
         <module>geography-server</module>
+        <module>entity-module</module>
+        <module>feedback-server</module>
+        <module>statistics-server</module>
+        <module>aqi-server</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -27,6 +31,12 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.12.0</version>
+            </dependency>
+
             <dependency>
                 <!--spring-boot        -->
                 <groupId>org.springframework.boot</groupId>
@@ -102,6 +112,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+        <!--nacos配置管理依赖-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!-- 服务发现：OpenFeign服务调用 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -124,7 +139,40 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.13.4.1</version>
         </dependency>
-
+        <!--        &lt;!&ndash;seata 依赖&ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
+        <!--            <version>2022.0.0.0</version>-->
+        <!--        </dependency>-->
+        <!--seata        -->
+        <!--引入Seata-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <version>${spring-cloud-alibaba.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.seata</groupId>
+                    <artifactId>seata-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>

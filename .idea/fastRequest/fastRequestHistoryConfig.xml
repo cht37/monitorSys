@@ -4,6 +4,35 @@
     <option name="historyList">
       <list>
         <ResponseHistory>
+          <option name="className" value="com.neu.monitorSys.feedback.controller.AqiFeedbackController" />
+          <option name="enableEnv" value="local" />
+          <option name="enableProject" value="feedback-server" />
+          <option name="method" value="getFeedbackByTelId" />
+          <option name="methodType" value="GET" />
+          <option name="name" value="根据公众监督员电话号码查询反馈信息" />
+          <option name="paramGroup">
+            <ParamGroupCollection>
+              <option name="bodyKeyValueListJson" value="9006740279" />
+              <option name="className" value="com.neu.monitorSys.feedback.controller.AqiFeedbackController" />
+              <option name="jsonDocument" value="&quot;No comment,Value =telId_41r5d&quot;" />
+              <option name="method" value="getFeedbackByTelId" />
+              <option name="methodDescription" value="根据公众监督员电话号码查询反馈信息" />
+              <option name="methodType" value="POST" />
+              <option name="multipartKeyValueListJson" value="[]" />
+              <option name="originUrl" value="/feedback/getFeedbackByTelId" />
+              <option name="pathParamsKeyValueListJson" value="[]" />
+              <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
+              <option name="url" value="/feedback/getFeedbackByTelId" />
+              <option name="urlEncodedKeyValueListJson" value="[]" />
+              <option name="urlParamsKeyValueListJson" value="[{&quot;comment&quot;:&quot;&quot;,&quot;customFlag&quot;:2,&quot;enabled&quot;:true,&quot;key&quot;:&quot;page&quot;,&quot;type&quot;:&quot;Number&quot;,&quot;value&quot;:&quot;1&quot;},{&quot;comment&quot;:&quot;&quot;,&quot;customFlag&quot;:2,&quot;enabled&quot;:true,&quot;key&quot;:&quot;size&quot;,&quot;type&quot;:&quot;Number&quot;,&quot;value&quot;:&quot;10&quot;}]" />
+              <option name="urlParamsKeyValueListText" value="page=1&#10;&amp;size=10" />
+            </ParamGroupCollection>
+          </option>
+          <option name="requestInfo" value="Request Url: http://localhost:8080/feedback/getFeedbackByTelId?size=%31%30&amp;page=%31&#13;&#10;Request Headers: &#13;&#10;    Accept: application/json,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#13;&#10;    User-Agent: Fast Request/2024.1.5.1&#13;&#10;    Accept-Encoding: gzip, deflate&#13;&#10;Request Body: &#13;&#10;    9006740279&#13;&#10;" />
+          <option name="response" value="ConnectException: Connection refused: no further information" />
+          <option name="url" value="/feedback/getFeedbackByTelId" />
+        </ResponseHistory>
+        <ResponseHistory>
           <option name="className" value="com.neu.monitorSys.roleManage.controller.RolesController" />
           <option name="enableEnv" value="local" />
           <option name="enableProject" value="role-server" />

@@ -83,12 +83,11 @@ public class JwtUtil {
      * @param jwt
      * @return
      */
-    public static Map getPayLoad(String jwt) throws ParseException {
+    public static Map<String,Object> getPayLoad(String jwt) throws ParseException {
         //parse() 把字符串转成一个对象,并解密
         JWSObject jwsObject=JWSObject.parse(jwt);
         Payload payload=jwsObject.getPayload();
-        Map<String,Object> map=payload.toJSONObject();
-        return map;
+        return payload.toJSONObject();
     }
 
 }

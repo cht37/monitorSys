@@ -2,40 +2,69 @@ server:
   port: 8002
 auth:
   white-list:
-    - /auth/login
+    - /api/v1/auth/login
+    - /api/v1/auth/login/mobile
     - /auth/logout
-    - /auth/register
+    - /api/v1/auth/public/register
+    - /api/v1/code/sms
 #    - /auth/refresh
 #    - /auth/verify
 spring:
   application:
     name: gateway
-  data:
-    redis:
-      host: 192.168.92.128
-      port: 6379
-      timeout: 1800000
-      password: cht021125
+#  data:
+#    redis:
+#      host: 192.168.92.128
+#      port: 6379
+#      timeout: 1800000
+#      password: cht021125
   main:
     web-application-type: reactive
+  config:
+    import: nacos:database.yaml, nacos:rabbitmq.yaml, nacos:redis.yaml,nacos:seata.yaml
   cloud:
     nacos:
+      username: nacos
+      password: nacos
       discovery: #启用 spring cloud nacos discovery
-        server-addr: 192.168.92.128:8848
+        server-addr: 192.168.244.128:8848
+      config:
+        server-addr: 192.168.244.128:8848
     gateway:
+      discovery:
+        locator:
+          enabled: true
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowedOrigins: "*"
+            allowedOrigins:
+               - "http://localhost:5173"
             allowedMethods:
               - GET
               - POST
               - PUT
+              - PATCH
               - DELETE
+              - OPTIONS
             allowedHeaders:
               - "*"
             allowCredentials: true
             maxAge: 360000
       routes:
+        - id: auth
+          uri: lb://auth-server
+          predicates:
+                - Path=/api/v1/auth/**
+        - id: feedback
+          uri: lb://feedback-server
+          predicates:
+                - Path=/api/v1/feedbacks/**
+        - id: user
+          uri: lb://user-server
+          predicates:
+                - Path=/api/v1/members/**,/api/v1/grid-managers/**
+
+
+
 

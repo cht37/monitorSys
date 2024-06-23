@@ -1,5 +1,6 @@
 package com.neu.monitorSys.auth.filter;
 
+import com.neu.monitorSys.auth.service.impl.MyUserDetailsService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,6 +8,9 @@ import jdk.jfr.Category;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
@@ -27,12 +31,17 @@ public class SmsAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private boolean postOnly = true;
 
     public SmsAuthenticationFilter() {
-        super(new AntPathRequestMatcher("/login/mobile", "POST"));
+        super(new AntPathRequestMatcher("/api/v1/auth/login/mobile", "POST"));
     }
-
+    UserDetailsService userDetailsService;
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+
+        //判断SecurityContextHolder是否已经有用户信息
+        if(SecurityContextHolder.getContext().getAuthentication()!=null){
+            return SecurityContextHolder.getContext().getAuthentication();
+        }
 
         if (postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not support: " + request.getMethod());
@@ -43,7 +52,6 @@ public class SmsAuthenticationFilter extends AbstractAuthenticationProcessingFil
         if (mobile == null) {
             mobile = "";
         }
-
         SmsAuthenticationToken authRequest = new SmsAuthenticationToken(mobile);
 
         setDetails(request, authRequest);

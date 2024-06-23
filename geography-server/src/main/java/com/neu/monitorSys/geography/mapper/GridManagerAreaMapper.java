@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.mapper;
 
-import com.neu.monitorSys.geography.DTO.GeographyDTO;
-import com.neu.monitorSys.geography.entity.GridManagerArea;
+import com.neu.monitorSys.geography.DTO.GeographyVO;
+import com.neu.monitorSys.entity.GridManagerArea;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,5 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface GridManagerAreaMapper extends BaseMapper<GridManagerArea> {
 
-    GeographyDTO getAreDetailById(Integer id);
+    GeographyVO getAreDetailById(Integer id);
 }

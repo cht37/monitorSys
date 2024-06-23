@@ -1,10 +1,11 @@
 package com.neu.monitorSys.user.mapper;
 
-import com.neu.monitorSys.user.entity.Member;
+import com.neu.monitorSys.entity.Member;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.neu.monitorSys.user.DTO.MemberWithRole;
+import com.neu.monitorSys.entity.Roles;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 /**
@@ -17,5 +18,7 @@ import org.springframework.stereotype.Component;
  */
 @Mapper
 public interface MemberMapper extends BaseMapper<Member> {
-   MemberWithRole selectMemberWithRole(String logId);
+   List<Roles> getRolesByMemberId(Integer memberId);
+
+   Integer getRoleIdByLogId(String logId);
 }

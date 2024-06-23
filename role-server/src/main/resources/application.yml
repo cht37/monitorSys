@@ -3,21 +3,35 @@ server:
 spring:
   application:
     name: role-server
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver #数据库驱动包
-    url: jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
-    username: root
-    password: cht021125
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver #数据库驱动包
+#    url: jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+#    username: root
+#    password: cht021125
   devtools:
     restart:
       enabled: true #是否支持热部署cloud:
   cloud:
     nacos:
+      username: nacos
+      password: nacos
       discovery: #启用 spring cloud nacos discovery
-        server-addr: 192.168.92.128:8848
-  data:
-    redis:
-      host: 192.168.92.128
-      port: 6379
-      timeout: 1800000
-      password: cht021125
+        server-addr: 192.168.244.128:8848
+      config:
+        server-addr: 192.168.244.128:8848
+  config:
+    import: nacos:database.yaml, nacos:redis.yaml,nacos:seata.yaml
+
+
+
+# Mybatis log plugin 插件输出日志配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#  data:
+#    redis:
+#      host: 192.168.92.128
+#      port: 6379
+#      timeout: 1800000
+#      password: cht021125

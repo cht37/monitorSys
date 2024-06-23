@@ -1,11 +1,13 @@
 package com.neu.monitorSys.roleManage.util;
 
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 @Order(-1)
 public final class RedisUtil {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
 
     /**
      * 指定缓存失效时间
@@ -75,7 +77,7 @@ public final class RedisUtil {
             if (key.length == 1) {
                 redisTemplate.delete(key[0]);
             } else {
-                redisTemplate.delete(CollectionUtils.arrayToList(key));
+                redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));
             }
         }
     }

@@ -2,13 +2,16 @@ package com.neu.monitorSys.auth.handler;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
-import com.neu.monitorSys.auth.DTO.MyResponse;
+import com.neu.monitorSys.auth.client.UserClient;
 import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.constants.ResultCode;
 import com.neu.monitorSys.auth.entity.CustomUserDetails;
-import com.neu.monitorSys.auth.entity.Member;
 import com.neu.monitorSys.auth.service.impl.JwtService;
 import com.neu.monitorSys.auth.utils.RedisUtil;
+import com.neu.monitorSys.entity.DTO.MemberWithRole;
+import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.entity.Member;
+import com.neu.monitorSys.entity.SysUser;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,23 +30,38 @@ public class LoginSuccessHandle extends SimpleUrlAuthenticationSuccessHandler {
     private JwtService jwtService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private UserClient userClient;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomUserDetails userDetail = BeanUtil.toBean(authentication.getPrincipal(), CustomUserDetails.class);
-        Member myUser = userDetail.getMember();
+        SysUser myUser = userDetail.getSysUser();
         try {
             //保存token，用户信息到redis
             myUser.setId(null);
-            redisUtil.set(AuthRedisPrefix.USER_DETAIL_PREFIX + myUser.getLogid(), JSONUtil.toJsonStr(myUser), 60 * 60 * 2);
-            MyResponse<String> myResponse = new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", jwtService.createToken(myUser.getLogid()));
+            String token = jwtService.createToken(myUser.getUserName());
+//            Object data = userClient.getMemberInfo(myUser.getUserName()).getData();
+//            MemberWithRole member = BeanUtil.toBean(data, MemberWithRole.class);
+            //自定义userDetail存入redis,用于token校验
+            redisUtil.set(AuthRedisPrefix.USER_CUSTOM_DETAIL_PREFIX + myUser.getUserName(), JSONUtil.toJsonStr(userDetail), 60 * 60 * 2);
+            //不需要，远程 user-server 已经存储
+//            redisUtil.set(AuthRedisPrefix.USER_ROLE_PREFIX + myUser.getUserName(), JSONUtil.toJsonStr(member), 60 * 60 * 2);
+            MyResponse<String> myResponse = new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", token);
+             //获取当前线程id
+            long threadId = Thread.currentThread().getId();
+            redisUtil.del(AuthRedisPrefix.USER_AUTHENTICATION_PREFIX+threadId);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().write(JSONUtil.toJsonStr(myResponse));
 
         } catch (JOSEException e) {
             e.printStackTrace();
-            redisUtil.del(AuthRedisPrefix.USER_DETAIL_PREFIX + myUser.getLogid());
-            redisUtil.del(AuthRedisPrefix.AUTH_PREFIX + myUser.getLogid());
+
+//            redisUtil.del(AuthRedisPrefix.USER_ROLE_PREFIX + myUser.getUserName());
+            redisUtil.del(AuthRedisPrefix.USER_CUSTOM_DETAIL_PREFIX + myUser.getUserName());
+            redisUtil.del(AuthRedisPrefix.AUTH_PREFIX + myUser.getUserName());
+             long threadId = Thread.currentThread().getId();
+            redisUtil.del(AuthRedisPrefix.USER_AUTHENTICATION_PREFIX+threadId);
             response.getWriter().write(JSONUtil.toJsonStr(new MyResponse<>(ResultCode.SERVER_ERROR.getCode(), "登录异常", null)));
         }
     }

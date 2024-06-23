@@ -1,7 +1,9 @@
 package com.neu.monitorSys.geography.service;
 
-import com.neu.monitorSys.geography.entity.Cities;
+import com.neu.monitorSys.entity.Cities;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -14,5 +16,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ICitiesService extends IService<Cities> {
     String getCityName(String cityId);
 
-    Integer getCityId(String cityName);
+    String getCityIdByProvinceId(String cityName,String provinceId);
+
+    /**
+     * 获取所有城市
+     */
+    List<Cities> getAllCities();
 }

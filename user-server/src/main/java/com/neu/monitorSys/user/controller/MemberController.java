@@ -2,12 +2,13 @@ package com.neu.monitorSys.user.controller;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import com.neu.monitorSys.user.DTO.MemberWithRole;
-import com.neu.monitorSys.user.DTO.MyResponse;
+//import com.neu.monitorSys.authority.IgnoreToken;
+//import com.neu.monitorSys.authority.IgnoreToken;
+import com.neu.monitorSys.entity.DTO.MemberWithRole;
+import com.neu.monitorSys.entity.DTO.MyResponse;
 import com.neu.monitorSys.user.constants.ResultCode;
-import com.neu.monitorSys.user.entity.Member;
+import com.neu.monitorSys.entity.Member;
 import com.neu.monitorSys.user.service.IMemberService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2024-06-04
  */
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/api/v1/members")
 public class MemberController {
     @Autowired
     private IMemberService memberService;
@@ -30,8 +31,8 @@ public class MemberController {
      * @param logId
      * @return
      */
-    @GetMapping("/getMemberInfo/{logId}")
-    public MyResponse<MemberWithRole> getMemberInfo(@PathVariable String logId) {
+    @GetMapping("/info")
+    public MyResponse<MemberWithRole> getMemberInfo(@RequestHeader("logId") String logId) {
         MemberWithRole memberWithRole = memberService.getMemberWithRole(logId);
         if(ObjectUtil.isNull(memberWithRole)){
             return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户信息失败", null);
@@ -42,9 +43,9 @@ public class MemberController {
     /**
      * 修改用户信息
      * @param member
-     * @return
+     * @return MyResponse<Boolean>
      */
-    @GetMapping("/updateMemberInfo")
+   @PutMapping
     public MyResponse<Boolean> updateMemberInfo(@RequestBody Member member) {
         boolean update = memberService.updateMember(member);
         if(!update){
@@ -55,12 +56,13 @@ public class MemberController {
     /**
      * 获取用户基本信息
      * @param logId
-     * @param method
+     * @param
      * @return
      */
-    @GetMapping("/getMember/{logId}")
-    public MyResponse<Member> getMember(@PathVariable String logId, @RequestParam(required = false) String method) {
-        Member member = memberService.getMember(logId, method);
+    @GetMapping("/basic/{logId}")
+//    @IgnoreToken(value = false)
+    public MyResponse<Member> getMember(@PathVariable String logId) {
+        Member member = memberService.getMember(logId);
         if(ObjectUtil.isNull(member)){
             return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户信息失败", null);
         }
@@ -71,7 +73,7 @@ public class MemberController {
      * @param mobile
      * @return
      */
-    @GetMapping("/getMemberByMobile/{mobile}")
+    @GetMapping("/by-mobile/{mobile}")
     public MyResponse<Member> getMemberByMobile(@PathVariable String mobile) {
         Member member = memberService.getMemberByMobile(mobile);
         if(ObjectUtil.isNull(member)){
@@ -80,5 +82,46 @@ public class MemberController {
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "获取用户信息成功", member);
     }
 
+    /**
+     * 根据id获取用户姓名
+     * @param logId
+     * @return
+     */
+    @GetMapping("/name")
+    public MyResponse<String> getName(@RequestParam String logId) {
+        String name = memberService.getNameById(logId);
+        if(name == null){
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户姓名失败", null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "获取用户姓名成功", name);
+    }
+    /**
+     * 根据id获取用户角色id
+     * @param logId
+     * @return
+     */
+    @GetMapping("/role-id/{logId}")
+    public MyResponse<Integer> getRoleIdByLogId(@PathVariable String logId) {
+        Integer id = memberService.getRoleIdByLogId(logId);
+        if(id == null){
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "获取用户id失败", null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "获取用户id成功", id);
+    }
+
+    /**
+     * 新增用户
+     * @param member
+     * @return
+     */
+    @PostMapping("/add")
+    public MyResponse<Boolean> addMember(@RequestBody Member member) {
+        try {
+            memberService.saveMember(member);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "新增用户失败"+e.getMessage(), false);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "新增用户成功", true);
+    }
 }
 

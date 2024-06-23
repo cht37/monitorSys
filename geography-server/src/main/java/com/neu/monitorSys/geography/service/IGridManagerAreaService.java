@@ -1,7 +1,9 @@
 package com.neu.monitorSys.geography.service;
 
-import com.neu.monitorSys.geography.DTO.GeographyDTO;
-import com.neu.monitorSys.geography.entity.GridManagerArea;
+import com.neu.monitorSys.geography.DTO.AreaMQDTO;
+import com.neu.monitorSys.geography.DTO.AreaDTO;
+import com.neu.monitorSys.geography.DTO.GeographyVO;
+import com.neu.monitorSys.entity.GridManagerArea;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -16,6 +18,20 @@ public interface IGridManagerAreaService extends IService<GridManagerArea> {
     /**
      * 根据Id获取管理区域信息
      */
-    GeographyDTO getAreDetailById(Integer id);
+    GeographyVO getAreDetailById(Integer id);
+
+    /**
+     * 写入管理区域信息
+     */
+    Boolean saveArea(AreaDTO areaDTO);
+
+    /**
+     * 通过MQ写入管理区域信息
+     */
+    Boolean saveAreaByMQ(AreaMQDTO area);
+    /**
+     * 通过网格名称（地址）获取网格id
+     */
+    Integer getGridIdByGridName(String gridName);
 
 }

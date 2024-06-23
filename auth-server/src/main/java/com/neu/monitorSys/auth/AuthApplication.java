@@ -1,5 +1,6 @@
 package com.neu.monitorSys.auth;
 
+import com.neu.monitorSys.auth.client.RoleClient;
 import com.neu.monitorSys.auth.client.UserClient;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +11,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(clients = {UserClient.class})
+@EnableFeignClients(clients = {UserClient.class, RoleClient.class})
 @MapperScan("com.neu.monitorSys.auth.mapper")
 public class AuthApplication {
     public static void main(String[] args) {

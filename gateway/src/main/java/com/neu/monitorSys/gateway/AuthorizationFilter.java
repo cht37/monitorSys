@@ -1,14 +1,15 @@
 package com.neu.monitorSys.gateway;
 
 import cn.hutool.core.util.StrUtil;
-import com.neu.monitorSys.gateway.DTO.Response;
+import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.entity.constants.SecurityConstants;
+import com.neu.monitorSys.entity.constants.ResultCode;
+import com.neu.monitorSys.gateway.client.AuthClient;
 import com.neu.monitorSys.gateway.config.AuthConfig;
-import com.neu.monitorSys.gateway.constants.ResultCode;
 import com.neu.monitorSys.gateway.util.RedisUtil;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import jakarta.annotation.Resource;
-import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Lazy;
@@ -23,19 +24,19 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Order(1)
 @Component
+@Slf4j
 public class AuthorizationFilter implements GlobalFilter {
 
     //    @Resource
 //    private AuthConfig myConfig;
-    private final FeignAuthClient feignAuthClient;
+    @Resource
+    @Lazy
+    private AuthClient authClient;
 
-    @Autowired
-    public AuthorizationFilter(@Lazy FeignAuthClient feignAuthClient) {
-        this.feignAuthClient = feignAuthClient;
-    }
 
     @Resource
     private RedisUtil redisUtil;
@@ -48,31 +49,51 @@ public class AuthorizationFilter implements GlobalFilter {
 
         ServerHttpResponse response = exchange.getResponse();
         JSONObject message = new JSONObject();
+
         ServerHttpRequest request = exchange.getRequest();
+        // 清洗请求头中from 参数
+        request = exchange.getRequest().mutate().headers(httpHeaders -> httpHeaders.remove(SecurityConstants.FROM)).build();
         //1、获取请求路径
-        String path = request.getPath().toString();
+        String path = request.getURI().getPath();
+        String api= request.getMethod().name()+" "+path;
+
 
         //处理白名单内不需要进行拦截的地址
         if (!Objects.isNull(myConfig.getWhiteList())) {
             for (String whitePath : myConfig.getWhiteList()) {
-                if (path.contains(whitePath)) {
+                if (api.contains(whitePath)) {
                     return chain.filter(exchange);
                 }
             }
         }
-        //Todo 有问题
+
         //获取对应的token
         String token = request.getHeaders().getFirst("Authorization");
         //判断传递了token才可以继续解析
         if (!StrUtil.isEmpty(token)) {
             //调用auth-server的验证接口
+            //获取账号
+//            Response<String> result = feignAuthClient.validate(token, path);
 
-            Response<String> result = feignAuthClient.validate(token);
+//            //阻塞同步获取返回结果
+//            Response<String> result = null;
+//            try {
+//                result = f.get();
+//            } catch (InterruptedException | ExecutionException e) {
+//                throw new RuntimeException(e);
+//            }4
+            MyResponse<String> result = getAuthResult(token, api);
+
             if (result.getStatusCode() == ResultCode.SUCCESS.getCode()) {
+                String logId = result.getData();
+                //将logId存入请求头
+                ServerHttpRequest newRequest = request.mutate().header("logId", logId).build();
+                exchange = exchange.mutate().request(newRequest).build();
                 return chain.filter(exchange);
             } else {
-                message.put("status", -1);
-                message.put("data", "鉴权失败");
+                message.put("statusCode", result.getStatusCode());
+                message.put("message", "鉴权失败");
+                message.put("data", null);
                 byte[] bits = message.toJSONString().getBytes(StandardCharsets.UTF_8);
                 DataBuffer buffer = response.bufferFactory().wrap(bits);
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -81,14 +102,29 @@ public class AuthorizationFilter implements GlobalFilter {
                 return response.writeWith(Mono.just(buffer));
             }
         }
-        message.put("status", -1);
-        message.put("data", "鉴权失败");
+        message.put("status", 401);
+        message.put("message", "鉴权失败");
+        message.put("data", null);
         byte[] bits = message.toJSONString().getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bits);
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         //指定编码，否则在浏览器中会中文乱码
         response.getHeaders().add("Content-Type", "text/plain;charset=UTF-8");
         return response.writeWith(Mono.just(buffer));
+    }
+    private MyResponse<String> getAuthResult(String token,String api){
+         CompletableFuture<MyResponse<String>> future = CompletableFuture.supplyAsync(
+                  // 在异步包装内执行我们的微服务请求
+                    () -> authClient.validate(token, api)
+         );
+            try {
+                // 等待相应返回结果
+                return future.get();
+            } catch (Exception ex) {
+                String msg = "网关检查接口是否存在,发生异常";
+                log.error(msg, ex);
+                throw new RuntimeException(msg);
+            }
     }
 }
 

@@ -4,7 +4,7 @@
 		"domain":"https://api.apifox.com",
 		"projectId":4546500,
 		"projectName":"个人项目",
-		"syncAfterSave":false
+		"syncAfterSave":true
 	},
 	"dataList":[
 		{
@@ -68,6 +68,15 @@
 				}
 			],
 			"name":"geography-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8080"
+				}
+			],
+			"name":"feedback-server"
 		}
 	],
 	"envList":[
@@ -77,7 +86,7 @@
 	"headerList":[],
 	"ignoreParseFieldList":[],
 	"maxDescriptionLength":-1,
-	"pmCollectionId":"",
+	"pmCollectionId":"f8973ded-7a4f-4340-8489-d1a1f23e31c5",
 	"postScript":"",
 	"preScript":"",
 	"projectList":[
@@ -86,7 +95,8 @@
 		"user-service",
 		"role-server",
 		"user-server",
-		"geography-server"
+		"geography-server",
+		"feedback-server"
 	],
 	"syncModel":{
 		"branch":"master",
@@ -104,5 +114,5 @@
 	"urlEncodedKeyValueList":[],
 	"urlParamsKeyValueList":[],
 	"urlSuffix":"",
-	"workspaceId":""
+	"workspaceId":"3d23d53f-b66a-47ba-9fab-02754f7d293d"
 }

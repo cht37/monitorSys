@@ -1,7 +1,9 @@
 package com.neu.monitorSys.geography.service;
 
-import com.neu.monitorSys.geography.entity.Provinces;
+import com.neu.monitorSys.entity.Provinces;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -20,5 +22,9 @@ public interface IProvincesService extends IService<Provinces> {
     /**
      * 获取省份id
      */
-    Integer getProvinceId(String provinceName);
+    String getProvinceId(String provinceName);
+    /**
+     * 获取所有省份
+     */
+    List<Provinces> getAllProvinces();
 }

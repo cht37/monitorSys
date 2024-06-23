@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GeographyDTO {
     String areaName;
+    String districtName;
     String cityName;
     String provinceName;
 }

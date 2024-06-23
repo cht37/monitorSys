@@ -35,8 +35,8 @@
 		"urlParamsKeyValueListJson":"[{\"comment\":\"\",\"customFlag\":2,\"enabled\":true,\"key\":\"mobile\",\"type\":\"String\",\"value\":\"mobile_2hfba\"}]",
 		"urlParamsKeyValueListText":"mobile=mobile_2hfba"
 	},
-	"pmRequestId":"",
-	"pmResponseId":"",
+	"pmRequestId":"a48e6e8e-e200-257f-1242-43693a375472",
+	"pmResponseId":"b3d428a8-a835-8428-ea20-d23c08fa8d28",
 	"tempId":"api_com.neu.monitorSys.auth.controller.SmsController.sendSmsCode",
 	"type":2
 }

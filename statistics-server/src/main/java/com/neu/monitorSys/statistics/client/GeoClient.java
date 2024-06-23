@@ -1,4 +1,4 @@
-package com.neu.monitorSys.feedback.client;
+package com.neu.monitorSys.statistics.client;
 
 import com.neu.monitorSys.entity.DTO.MyResponse;
 import com.neu.monitorSys.entity.DTO.AreaDTO;

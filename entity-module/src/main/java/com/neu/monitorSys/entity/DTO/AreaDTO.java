@@ -1,4 +1,4 @@
-package com.neu.monitorSys.feedback.DTO;
+package com.neu.monitorSys.entity.DTO;
 
 import lombok.Data;
 

@@ -79,7 +79,7 @@ public class Statistics implements Serializable {
     /**
      * 所属网格员编号，对应grid_manager表
      */
-    private Integer gmId;
+    private String gmId;
 
     /**
      * 反馈者手机号（公众监督员）

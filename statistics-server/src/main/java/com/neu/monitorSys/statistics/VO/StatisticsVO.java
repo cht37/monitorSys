@@ -91,7 +91,7 @@ public class StatisticsVO {
     /**
      * 所属网格员编号，对应grid_manager表
      */
-    private Integer gmId;
+    private String gmId;
 
     /**
      * 网格员姓名

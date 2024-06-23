@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.neu.monitorSys.entity.Statistics;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.neu.monitorSys.statistics.DTO.ReportDTO;
+import com.neu.monitorSys.statistics.DTO.StatisticsQueryDTO;
 import com.neu.monitorSys.statistics.VO.StatisticsVO;
 
 /**
@@ -16,10 +17,10 @@ import com.neu.monitorSys.statistics.VO.StatisticsVO;
  */
 public interface IStatisticsService extends IService<Statistics> {
         //统计分析数据
-        public void statisticsData(ReportDTO reportDTO);
+        void statisticsData(ReportDTO reportDTO);
         //网格员上报数据
-        public void gridManagerReport(ReportDTO reportDTO,String logId);
+        void gridManagerReport(ReportDTO reportDTO,String logId);
         //分条件查询统计数据
-        public IPage<StatisticsVO> queryStatisticsData();
+        IPage<StatisticsVO> queryStatisticsData(StatisticsQueryDTO statisticsQueryDTO, int page, int size);
 
 }

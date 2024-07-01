@@ -1,6 +1,6 @@
 package com.neu.monitorSys.roleManage.service;
 
-import com.neu.monitorSys.entity.Permissions;
+import com.neu.monitorSys.common.entity.Permissions;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -30,5 +30,19 @@ public interface IPermissionsService extends IService<Permissions> {
      * @return
      */
     List<Permissions> getPermissionsByLogId(String logId);
+
+
+    /**
+     * 获取权限树
+     */
+    List<Permissions> getPermissionsTree();
+
+    /**
+     * 新增权限
+     * @param roleId 角色id
+     * @param permissionsId 权限id
+     * @return  是否成功
+     */
+    boolean addPermissions(Integer roleId,Integer[] permissionsId);
 
 }

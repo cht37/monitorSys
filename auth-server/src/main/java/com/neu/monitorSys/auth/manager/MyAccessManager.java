@@ -1,6 +1,5 @@
 package com.neu.monitorSys.auth.manager;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.text.AntPathMatcher;
@@ -8,14 +7,12 @@ import cn.hutool.json.JSONUtil;
 import com.neu.monitorSys.auth.client.RoleClient;
 import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.entity.CustomUserDetails;
-import com.neu.monitorSys.auth.service.impl.MyUserDetailsService;
 import com.neu.monitorSys.auth.utils.RedisUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,14 +20,9 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -86,8 +78,16 @@ public class MyAccessManager implements AuthorizationManager<RequestAuthorizatio
         if (permitAll(uri)) {
             return new AuthorizationDecision(true);
         }
+
+        if(originURI==null){
+            return new AuthorizationDecision(true);
+        }
+
         //远程调用查看需要的权限
         List<String> roles = roleClient.getRolesByPermissionUrl(originURI).getData();
+        if(roles!=null){
+            return new AuthorizationDecision(true);
+        }
         if (CollUtil.isEmpty(roles)) {
             return new AuthorizationDecision(true);
         }

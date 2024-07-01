@@ -1,20 +1,14 @@
 package com.neu.monitorSys.auth.service.impl;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import com.neu.monitorSys.auth.entity.CustomUserDetails;
 import com.neu.monitorSys.auth.utils.JwtUtil;
 import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.utils.RedisUtil;
 import com.nimbusds.jose.JOSEException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import java.text.ParseException;
-import java.util.Map;
 
 @Service
 public class JwtService {

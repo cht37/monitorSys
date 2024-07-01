@@ -1,7 +1,5 @@
 package com.neu.monitorSys.user.consumer;
 
-import com.neu.monitorSys.entity.GridManager;
-import com.neu.monitorSys.user.DTO.AssignDTO;
 import com.neu.monitorSys.user.client.GeoClient;
 import com.neu.monitorSys.user.service.IGridManagerService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

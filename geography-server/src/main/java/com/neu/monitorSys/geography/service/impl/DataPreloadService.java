@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.service.impl;
 
-import com.neu.monitorSys.entity.Cities;
-import com.neu.monitorSys.entity.Provinces;
+import com.neu.monitorSys.common.entity.Cities;
+import com.neu.monitorSys.common.entity.Provinces;
 import com.neu.monitorSys.geography.constants.GeoRedisPrefix;
 import com.neu.monitorSys.geography.service.ICitiesService;
 import com.neu.monitorSys.geography.service.IProvincesService;

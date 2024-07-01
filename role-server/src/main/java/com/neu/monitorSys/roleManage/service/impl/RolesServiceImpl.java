@@ -5,8 +5,9 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.Roles;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.UserRedisPrefix;
+import com.neu.monitorSys.common.entity.Roles;
 import com.neu.monitorSys.roleManage.VO.PermissionRoleMapVO;
 import com.neu.monitorSys.roleManage.client.UserClient;
 import com.neu.monitorSys.roleManage.mapper.RolesMapper;
@@ -95,6 +96,9 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
 
     @Override
     public List<String> getRoleListByPermissionUrl(String permissionUrl) {
+        if(permissionUrl == null || permissionUrl.equals("")){
+            return new ArrayList<>();
+        }
         List<String> roles = new ArrayList<>();
 
         // 从数据库查询角色信息
@@ -119,9 +123,13 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
 
     @Override
     public List<String> getRoleNamesByUserId(String userId) {
-        MyResponse<Integer> roleId = userClient.getRoleIdByLogId(userId);
+        MyResponse<List<Integer>> response = userClient.getRoleIdByLogId(userId);
         //从数据库查询用户角色名称列表
-        List<Roles> rolesList = rolesMapper.selectList(new QueryWrapper<Roles>().lambda().eq(Roles::getId, roleId.getData()));
+        if (response.getData() == null) {
+            return new ArrayList<>();
+        }
+        List<Integer> roleIds = response.getData();
+        List<Roles> rolesList = rolesMapper.selectList(new QueryWrapper<Roles>().lambda().in(Roles::getId, roleIds));
         List<String> roleNames = new ArrayList<>();
         for (Roles role : rolesList) {
             roleNames.add(role.getMname());
@@ -154,6 +162,56 @@ public class RolesServiceImpl extends ServiceImpl<RolesMapper, Roles> implements
         } catch (Exception e) {
             throw new RuntimeException("分配角色异常"+e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean updateUserRole(String logId, List<Integer> roleIds) {
+        //删除redis缓存
+        redisUtil.del(UserRedisPrefix.USER_ROLE_PREFIX + logId);
+        // 先删除用户所有角色
+        rolesMapper.deleteUserRole(logId);
+        // 判断是否有角色
+        if (roleIds == null || roleIds.size() == 0) {
+            return true;
+        }
+        //判断角色是否存在
+        List<Roles> roles = rolesMapper.selectList(new QueryWrapper<Roles>().lambda().in(Roles::getId, roleIds));
+        if (roles.size() != roleIds.size()) {
+            throw new RuntimeException("角色不存在");
+        }
+        // 重新分配角色
+        for (Integer roleId : roleIds) {
+            rolesMapper.addUserRoleByLogId(logId, roleId);
+        }
+        return true;
+    }
+
+    @Override
+    public List<String> getLogIdByRoleName(String roleNames) {
+        List<String> logIds = new ArrayList<>();
+        //判断角色名是否为空
+        if (roleNames == null || roleNames.equals("")) {
+            return logIds;
+        }
+        //判断角色名是否为逗号分隔
+        if (roleNames.contains(",")) {
+            String[] roleNameList = roleNames.split(",");
+            ArrayList<String> list = ListUtil.toList(roleNameList);
+            logIds= rolesMapper.getLogIdByRoleNames(list);
+        } else {
+            logIds = rolesMapper.getLogIdByRoleName(roleNames);
+        }
+        return logIds;
+    }
+
+    @Override
+    public boolean isRoleEnabled(Integer roleId) {
+        Roles role = rolesMapper.selectById(roleId);
+        if (role == null) {
+            throw new RuntimeException("角色不存在");
+        }
+        return role.getEnable()==1;
     }
 
 }

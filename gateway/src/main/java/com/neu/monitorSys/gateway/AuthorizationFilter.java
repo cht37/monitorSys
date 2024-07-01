@@ -1,9 +1,9 @@
 package com.neu.monitorSys.gateway;
 
 import cn.hutool.core.util.StrUtil;
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.constants.SecurityConstants;
-import com.neu.monitorSys.entity.constants.ResultCode;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.SecurityConstants;
+import com.neu.monitorSys.common.constants.ResultCode;
 import com.neu.monitorSys.gateway.client.AuthClient;
 import com.neu.monitorSys.gateway.config.AuthConfig;
 import com.neu.monitorSys.gateway.util.RedisUtil;
@@ -19,12 +19,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Order(1)
 @Component
@@ -37,12 +41,16 @@ public class AuthorizationFilter implements GlobalFilter {
     @Lazy
     private AuthClient authClient;
 
-
+    private final WebClient webClient;
     @Resource
     private RedisUtil redisUtil;
 
     @Resource
     private AuthConfig myConfig;
+
+    public AuthorizationFilter(WebClient.Builder webClientBuilder) {
+       this.webClient = webClientBuilder.baseUrl("lb://auth-server").build();
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -112,19 +120,28 @@ public class AuthorizationFilter implements GlobalFilter {
         response.getHeaders().add("Content-Type", "text/plain;charset=UTF-8");
         return response.writeWith(Mono.just(buffer));
     }
-    private MyResponse<String> getAuthResult(String token,String api){
-         CompletableFuture<MyResponse<String>> future = CompletableFuture.supplyAsync(
-                  // 在异步包装内执行我们的微服务请求
-                    () -> authClient.validate(token, api)
-         );
-            try {
-                // 等待相应返回结果
-                return future.get();
-            } catch (Exception ex) {
-                String msg = "网关检查接口是否存在,发生异常";
-                log.error(msg, ex);
-                throw new RuntimeException(msg);
-            }
-    }
+        private MyResponse<String> getAuthResult(String token,String api){
+             CompletableFuture<MyResponse<String>> future = CompletableFuture.supplyAsync(
+                      // 在异步包装内执行我们的微服务请求
+                        () -> authClient.validate(token, api)
+             );
+                try {
+                    // 等待相应返回结果
+                    return future.get();
+                } catch (Exception ex) {
+                    String msg = "网关检查接口是否存在,发生异常";
+                    log.error(msg, ex);
+                    throw new RuntimeException(msg);
+                }
+            //线程池
+//            ExecutorService executorService = Executors.newCachedThreadPool();
+//            Mono<MyResponse> responseMono = webClient.get()
+//                    .uri("/api/v1/auth/validate?"+"originURI=" + api)
+//                    .header("Authorization", token)
+//                    .retrieve()
+//                    .bodyToMono(MyResponse.class);
+//            MyResponse result = responseMono.block(Duration.ofSeconds(1));
+//            return result;
+        }
 }
 

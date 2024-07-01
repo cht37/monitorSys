@@ -1,6 +1,6 @@
 package com.neu.monitorSys.user.client;
 
-import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.common.DTO.MyResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,5 +12,8 @@ public interface GeoClient {
     MyResponse getGeoInfo(@PathVariable("id") Integer id);
 
     @GetMapping("/api/v1/areas/grid-id")
-    MyResponse getGridIdByGridName(@RequestParam("gridName") String gridName);
+    MyResponse<Integer> getGridIdByGridName(@RequestParam("gridName") String gridName);
+
+    @GetMapping("/api/v1/areas/grid-id-like")
+    MyResponse<Integer> getGridIdByGridNameLike(@RequestParam("gridName") String gridName);
 }

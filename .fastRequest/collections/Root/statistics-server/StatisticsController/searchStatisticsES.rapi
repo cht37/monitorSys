@@ -1,0 +1,78 @@
+{
+	"activeGroup":"Default",
+	"apiParamGroup":{},
+	"apifoxRequestId":189081708,
+	"childList":[],
+	"classDescription":"<p> 前端控制器 </p>",
+	"description":"",
+	"directory":"/.fastRequest/collections/Root/statistics-server/StatisticsController",
+	"domain":"http://localhost:8080",
+	"enableEnv":"local",
+	"enableProject":"statistics-server",
+	"filePath":"/.fastRequest/collections/Root/statistics-server/StatisticsController~searchStatisticsES.rapi",
+	"id":"api_com.neu.monitorSys.statistics.controller.StatisticsController.searchStatisticsES",
+	"mark":false,
+	"module":"statistics-server",
+	"name":"多条件查询统计数据ES",
+	"paramGroup":{
+		"bodyKeyValueListJson":"",
+		"classDescription":"<p> 前端控制器 </p>",
+		"className":"com.neu.monitorSys.statistics.controller.StatisticsController",
+		"headerParamsKeyValueList":[],
+		"jsonDocument":"",
+		"method":"searchStatisticsES",
+		"methodDescription":"多条件查询统计数据ES",
+		"methodType":"GET",
+		"multipartKeyValueListJson":"[]",
+		"originUrl":"/api/v1/statistics/es/search",
+		"pathParamsKeyValueListJson":"[]",
+		"postScript":"",
+		"postType":"json",
+		"preScript":"",
+		"returnDocument":"{\"statusCode\":\"No comment,Type =Number\",\"message\":\"No comment,Type =String\",\"data\":{}}",
+		"returnTypeParamMap":{
+			"return":{
+				"customFlag":2,
+				"enabled":true,
+				"key":"return",
+				"type":"Object",
+				"value":{
+					"statusCode":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"statusCode",
+						"type":"Number",
+						"value":1
+					},
+					"message":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"message",
+						"type":"String",
+						"value":"message_c7pq7"
+					},
+					"data":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"data",
+						"type":"Object",
+						"value":{}
+					}
+				}
+			}
+		},
+		"tempId":"",
+		"url":"/api/v1/statistics/es/search",
+		"urlEncodedKeyValueListJson":"[]",
+		"urlEncodedKeyValueListText":"",
+		"urlParamsKeyValueListJson":"[{\"comment\":\"\",\"customFlag\":2,\"enabled\":true,\"key\":\"id\",\"type\":\"Number\",\"value\":1},{\"comment\":\"对应反馈信息编号\",\"customFlag\":2,\"enabled\":true,\"key\":\"afId\",\"type\":\"Number\",\"value\":1},{\"comment\":\"所属省区域名称\",\"customFlag\":2,\"enabled\":true,\"key\":\"provinceName\",\"type\":\"String\",\"value\":\"provinceName_lb8cs\"},{\"comment\":\"所属市区域名称\",\"customFlag\":2,\"enabled\":true,\"key\":\"cityName\",\"type\":\"String\",\"value\":\"cityName_r25n0\"},{\"comment\":\"所属区区域名称\",\"customFlag\":2,\"enabled\":true,\"key\":\"districtName\",\"type\":\"String\",\"value\":\"districtName_nkqpe\"},{\"comment\":\"反馈信息所在区域详细地址\",\"customFlag\":2,\"enabled\":true,\"key\":\"address\",\"type\":\"String\",\"value\":\"address_oz6oa\"},{\"comment\":\"空气二氧化硫浓度（μg/m3）上限\",\"customFlag\":2,\"enabled\":true,\"key\":\"so2ValueMax\",\"type\":\"Number\",\"value\":1},{\"comment\":\"空气二氧化硫浓度（μg/m3）下限\",\"customFlag\":2,\"enabled\":true,\"key\":\"so2ValueMin\",\"type\":\"Number\",\"value\":1},{\"comment\":\"按SO2排序\",\"customFlag\":2,\"enabled\":true,\"key\":\"so2Ascending\",\"type\":\"Boolean\",\"value\":true},{\"comment\":\"一氧化碳浓度（mg/m3）上限\",\"customFlag\":2,\"enabled\":true,\"key\":\"coValueMax\",\"type\":\"Number\",\"value\":1},{\"comment\":\"一氧化碳浓度（mg/m3）下限\",\"customFlag\":2,\"enabled\":true,\"key\":\"coValueMin\",\"type\":\"Number\",\"value\":1},{\"comment\":\"按CO排序\",\"customFlag\":2,\"enabled\":true,\"key\":\"coAscending\",\"type\":\"Boolean\",\"value\":true},{\"comment\":\"空气悬浮颗粒物浓度（μg/m3）上限\",\"customFlag\":2,\"enabled\":true,\"key\":\"spmValueMax\",\"type\":\"Number\",\"value\":1},{\"comment\":\"空气悬浮颗粒物浓度（μg/m3）下限\",\"customFlag\":2,\"enabled\":true,\"key\":\"spmValueMin\",\"type\":\"Number\",\"value\":1},{\"comment\":\"按SPM排序\",\"customFlag\":2,\"enabled\":true,\"key\":\"spmAscending\",\"type\":\"Boolean\",\"value\":true},{\"comment\":\"实测空气质量指数上限\",\"customFlag\":2,\"enabled\":true,\"key\":\"aqiMax\",\"type\":\"Number\",\"value\":1},{\"comment\":\"实测空气质量指数下限\",\"customFlag\":2,\"enabled\":true,\"key\":\"aqiMin\",\"type\":\"Number\",\"value\":1},{\"comment\":\"按AQI排序\",\"customFlag\":2,\"enabled\":true,\"key\":\"aqiAscending\",\"type\":\"Boolean\",\"value\":true},{\"comment\":\"确认日期\",\"customFlag\":2,\"enabled\":true,\"key\":\"confirmDatetime\",\"type\":\"String\",\"value\":\"2024-06-30 00:00:00\"},{\"comment\":\"所属网格员编号，对应grid_manager表\",\"customFlag\":2,\"enabled\":true,\"key\":\"gmId\",\"type\":\"Number\",\"value\":1},{\"comment\":\"反馈者手机号（公众监督员）\",\"customFlag\":2,\"enabled\":true,\"key\":\"fdTel\",\"type\":\"String\",\"value\":\"fdTel_sv0iz\"},{\"comment\":\"页数\",\"customFlag\":2,\"enabled\":true,\"key\":\"page\",\"type\":\"Number\",\"value\":\"1\"},{\"comment\":\"每页大小\",\"customFlag\":2,\"enabled\":true,\"key\":\"size\",\"type\":\"Number\",\"value\":\"10\"}]",
+		"urlParamsKeyValueListText":"id=1\n&afId=1\n&provinceName=provinceName_lb8cs\n&cityName=cityName_r25n0\n&districtName=districtName_nkqpe\n&address=address_oz6oa\n&so2ValueMax=1\n&so2ValueMin=1\n&so2Ascending=true\n&coValueMax=1\n&coValueMin=1\n&coAscending=true\n&spmValueMax=1\n&spmValueMin=1\n&spmAscending=true\n&aqiMax=1\n&aqiMin=1\n&aqiAscending=true\n&confirmDatetime=2024-06-30 00:00:00\n&gmId=1\n&fdTel=fdTel_sv0iz\n&page=1\n&size=10"
+	},
+	"pmRequestId":"",
+	"pmResponseId":"",
+	"tempId":"api_com.neu.monitorSys.statistics.controller.StatisticsController.searchStatisticsES",
+	"type":2
+}

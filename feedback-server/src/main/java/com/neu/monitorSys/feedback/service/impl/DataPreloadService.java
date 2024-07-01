@@ -1,7 +1,7 @@
 package com.neu.monitorSys.feedback.service.impl;
 
 
-import com.neu.monitorSys.entity.AqiFeedback;
+import com.neu.monitorSys.common.entity.AqiFeedback;
 import com.neu.monitorSys.feedback.service.IAqiFeedbackService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.neu.monitorSys.geography.mapper;
 
-import com.neu.monitorSys.entity.Provinces;
+import com.neu.monitorSys.common.entity.Provinces;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

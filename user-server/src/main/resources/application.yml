@@ -13,6 +13,9 @@ spring:
   #    restart:
   #      enabled: true #是否支持热部署cloud:
   cloud:
+    openfeign:
+      okhttp:
+        enabled: true
     nacos:
       discovery: #启用 spring cloud nacos discovery
         server-addr: 192.168.244.128:8848

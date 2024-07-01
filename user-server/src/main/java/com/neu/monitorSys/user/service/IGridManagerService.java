@@ -2,8 +2,9 @@ package com.neu.monitorSys.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.neu.monitorSys.user.DTO.AssignDTO;
+import com.neu.monitorSys.user.DTO.GridManagerDTO;
 import com.neu.monitorSys.user.DTO.GridManagerFullVO;
-import com.neu.monitorSys.entity.GridManager;
+import com.neu.monitorSys.common.entity.GridManager;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -23,7 +24,7 @@ public interface IGridManagerService extends IService<GridManager> {
     /**
      * 多条件查询网格员信息
      */
-    IPage<GridManagerFullVO> findGridManagersByConditions(GridManagerFullVO gridManagerFullVO, int page, int size);
+    IPage<GridManagerFullVO> findGridManagersByConditions(GridManagerDTO gridManagerDTO, int page, int size);
 
     /**
      * 修改网格员信息
@@ -46,5 +47,20 @@ public interface IGridManagerService extends IService<GridManager> {
      * 网格员接受对某网格的指派
      */
     boolean acceptAssign(AssignDTO assignDTO,String logId);
+
+    /**
+     * 网格员是否正在处理反馈
+     */
+    boolean isProcessing(String logId);
+
+    /**
+     * 根据logId获取AfId
+     */
+    Integer getAfIdByLogId(String logId);
+
+    /**
+     * 修改网格员状态
+     */
+    boolean updateState(String logId, Integer state);
 
 }

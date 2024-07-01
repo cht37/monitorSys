@@ -1,14 +1,10 @@
 package com.neu.monitorSys.feedback.service.impl;
 
-import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.neu.monitorSys.entity.AqiFeedback;
-import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
+import com.neu.monitorSys.common.entity.AqiFeedback;
 import com.neu.monitorSys.feedback.constants.FeedbackRedisPrefix;
 import com.neu.monitorSys.feedback.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;

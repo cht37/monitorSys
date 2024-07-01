@@ -4,8 +4,8 @@ package com.neu.monitorSys.auth.service.impl;
 import com.neu.monitorSys.auth.client.RoleClient;
 import com.neu.monitorSys.auth.entity.CustomUserDetails;
 import com.neu.monitorSys.auth.service.SysUserService;
-import com.neu.monitorSys.entity.Permissions;
-import com.neu.monitorSys.entity.SysUser;
+import com.neu.monitorSys.common.entity.Permissions;
+import com.neu.monitorSys.common.entity.SysUser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -45,6 +45,10 @@ public class MyUserDetailsService implements UserDetailsService {
             if (user.getPassword() == null||user.getPassword().equals("")) {
                 throw new InternalAuthenticationServiceException("User has no password set");
             }
+        }
+        //如果用户state为0，说明用户被禁用，拒绝访问
+        if (user.getState() == 0) {
+            throw new InternalAuthenticationServiceException("User is disabled");
         }
         //获取用户角色
         List<String> roles = roleClient.getRoleNamesByUserId(user.getUserName()).getData();

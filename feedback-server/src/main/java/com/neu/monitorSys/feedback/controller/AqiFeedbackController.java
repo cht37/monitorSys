@@ -2,9 +2,9 @@ package com.neu.monitorSys.feedback.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.neu.monitorSys.entity.AqiFeedback;
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.constants.ResultCode;
+import com.neu.monitorSys.common.entity.AqiFeedback;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.ResultCode;
 import com.neu.monitorSys.feedback.DTO.AqiFeedBackVO;
 import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
 import com.neu.monitorSys.feedback.DTO.AssignDTO;
@@ -48,12 +48,12 @@ public class AqiFeedbackController {
 
     /**
      * 根据公众监督员电话号码查询反馈信息
-     * @param telId
-     * @param page
-     * @param size
-     * @return
+     * @param telId 公众监督员电话号码
+     * @param page 页数
+     * @param size 每页大小
+     * @return IPage<AqiFeedBackVO> 反馈信息
      */
-    @PostMapping("/tel/{telId}")
+    @GetMapping("/tel/{telId}")
     public MyResponse<IPage<AqiFeedBackVO>> getFeedbackByTelId(@PathVariable String telId,
                                                                @RequestParam(defaultValue = "1") int page,
                                                                @RequestParam(defaultValue = "10") int size) {
@@ -152,8 +152,8 @@ public class AqiFeedbackController {
      * @param size 大小
      * @return  返回查询结果
      */
-    @PostMapping("/search")
-    public MyResponse<IPage<AqiFeedBackVO>> getFeedBackByConditions(@RequestBody FeedbackQueryDTO feedbackQueryDTO,
+    @GetMapping("/search")
+    public MyResponse<IPage<AqiFeedBackVO>> getFeedBackByConditions(@ModelAttribute FeedbackQueryDTO feedbackQueryDTO,
                                                                    @RequestParam(defaultValue = "1") int page,
                                                                    @RequestParam(defaultValue = "10") int size){
         IPage<AqiFeedBackVO> feedbacks = null;
@@ -174,17 +174,34 @@ public class AqiFeedbackController {
      */
     @GetMapping("/waiting-list")
     public MyResponse<IPage<AqiFeedBackVO>> getFeedbackByGridId(@RequestHeader("logId") String gridId,
+                                                                @RequestParam(required = false) Integer finish,
                                                                 @RequestParam(defaultValue = "1") int page,
                                                                 @RequestParam(defaultValue = "10") int size) {
         IPage<AqiFeedBackVO> feedbacks = null;
         try {
-            feedbacks = aqiFeedbackService.getFeedbackByGridId(gridId, page, size);
+            feedbacks = aqiFeedbackService.getFeedbackByGridId(gridId,finish, page, size);
         } catch (Exception e) {
-            return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "查询失败", null);
+            return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "查询失败"+e.getMessage(), null);
         }
 
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", feedbacks);
     }
 
+
+    /**
+     * 获取当前处理的反馈指派
+     * @param logId 网格员id
+     * @return AqiFeedBackVO
+     */
+    @GetMapping("/current")
+    public MyResponse<AqiFeedBackVO> getCurrentFeedback(@RequestHeader("logId") String logId){
+        AqiFeedBackVO feedback = null;
+        try {
+            feedback = aqiFeedbackService.getCurrentFeedback(logId);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.NOT_FOUND.getCode(),"查询失败"+e.getMessage(), null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", feedback);
+    }
 }
 

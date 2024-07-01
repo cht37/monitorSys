@@ -1,0 +1,87 @@
+{
+	"activeGroup":"Default",
+	"apiParamGroup":{},
+	"apifoxRequestId":189073713,
+	"childList":[],
+	"classDescription":"<p> 权限表前端控制器 </p>",
+	"description":"",
+	"directory":"/.fastRequest/collections/Root/role-server/PermissionsController",
+	"domain":"http://localhost:8004",
+	"enableEnv":"local",
+	"enableProject":"role-server",
+	"filePath":"/.fastRequest/collections/Root/role-server/PermissionsController~addPermissions.rapi",
+	"id":"api_com.neu.monitorSys.roleManage.controller.PermissionsController.addPermissions",
+	"mark":false,
+	"module":"role-server",
+	"name":"新增角色权限",
+	"paramGroup":{
+		"bodyKeyValueListJson":"[\n  1\n]",
+		"classDescription":"<p> 权限表前端控制器 </p>",
+		"className":"com.neu.monitorSys.roleManage.controller.PermissionsController",
+		"headerParamsKeyValueList":[],
+		"jsonDocument":"[\n  \"No comment,Value =1\"\n]",
+		"method":"addPermissions",
+		"methodDescription":"新增角色权限",
+		"methodType":"POST",
+		"multipartKeyValueListJson":"[]",
+		"originUrl":"/api/v1/permissions/{roleId}/add",
+		"pathParamsKeyValueListJson":"[{\"comment\":\"用户id\",\"customFlag\":2,\"enabled\":true,\"key\":\"roleId\",\"type\":\"Number\",\"value\":\"1\"}]",
+		"postScript":"",
+		"postType":"json",
+		"preScript":"",
+		"returnDocument":"{\"statusCode\":\"No comment,Type =Number\",\"message\":\"No comment,Type =String\",\"data\":{\"java.lang.Boolean\":\"No comment,Type =Boolean\"}}",
+		"returnTypeParamMap":{
+			"return":{
+				"customFlag":2,
+				"enabled":true,
+				"key":"return",
+				"type":"Object",
+				"value":{
+					"statusCode":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"statusCode",
+						"type":"Number",
+						"value":1
+					},
+					"message":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"message",
+						"type":"String",
+						"value":"message_hqvwv"
+					},
+					"data":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"data",
+						"type":"Object",
+						"value":{
+							"java.lang.Boolean":{
+								"comment":"",
+								"customFlag":2,
+								"enabled":true,
+								"key":"java.lang.Boolean",
+								"type":"Boolean",
+								"value":true
+							}
+						}
+					}
+				}
+			}
+		},
+		"tempId":"",
+		"url":"/api/v1/permissions/{roleId}/add",
+		"urlEncodedKeyValueListJson":"[]",
+		"urlEncodedKeyValueListText":"",
+		"urlParamsKeyValueListJson":"[]",
+		"urlParamsKeyValueListText":""
+	},
+	"pmRequestId":"",
+	"pmResponseId":"",
+	"tempId":"api_com.neu.monitorSys.roleManage.controller.PermissionsController.addPermissions",
+	"type":2
+}

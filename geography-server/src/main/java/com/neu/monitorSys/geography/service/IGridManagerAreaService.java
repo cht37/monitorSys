@@ -3,7 +3,7 @@ package com.neu.monitorSys.geography.service;
 import com.neu.monitorSys.geography.DTO.AreaMQDTO;
 import com.neu.monitorSys.geography.DTO.AreaDTO;
 import com.neu.monitorSys.geography.DTO.GeographyVO;
-import com.neu.monitorSys.entity.GridManagerArea;
+import com.neu.monitorSys.common.entity.GridManagerArea;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -33,5 +33,10 @@ public interface IGridManagerAreaService extends IService<GridManagerArea> {
      * 通过网格名称（地址）获取网格id
      */
     Integer getGridIdByGridName(String gridName);
+
+    /**
+     * 通过网格地址模糊查询获取网格Id
+     */
+    Integer getGridIdByGridNameLike(String gridName);
 
 }

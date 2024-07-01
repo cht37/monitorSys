@@ -2,7 +2,7 @@ package com.neu.monitorSys.geography.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.District;
+import com.neu.monitorSys.common.entity.District;
 import com.neu.monitorSys.geography.mapper.DistrictMapper;
 import com.neu.monitorSys.geography.service.IDistrictService;
 import org.springframework.beans.factory.annotation.Autowired;

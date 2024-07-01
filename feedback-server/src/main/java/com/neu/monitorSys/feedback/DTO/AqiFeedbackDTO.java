@@ -51,6 +51,11 @@ public class AqiFeedbackDTO {
     private String afTime;
 
     /**
+     * 反馈状态，0未指派，1已指派，2正在处理，3已处理
+     */
+    private Integer state;
+
+    /**
      * 备注
      */
     private String remarks;

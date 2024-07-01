@@ -3,7 +3,7 @@ package com.neu.monitorSys.auth.handler;
 import cn.hutool.json.JSONUtil;
 import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.utils.RedisUtil;
-import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.common.DTO.MyResponse;
 import com.neu.monitorSys.auth.constants.ResultCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

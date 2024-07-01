@@ -1,6 +1,6 @@
 package com.neu.monitorSys.geography.service;
 
-import com.neu.monitorSys.entity.Cities;
+import com.neu.monitorSys.common.entity.Cities;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

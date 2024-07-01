@@ -1,7 +1,7 @@
 {
 	"activeGroup":"Default",
 	"apiParamGroup":{},
-	"apifoxRequestId":186831055,
+	"apifoxRequestId":187619349,
 	"childList":[],
 	"classDescription":"<p> 公众监督反馈表 前端控制器 </p>",
 	"description":"",
@@ -11,6 +11,8 @@
 	"enableProject":"feedback-server",
 	"filePath":"/.fastRequest/collections/Root/feedback-server/AqiFeedbackController~getFeedbackByGridId.rapi",
 	"id":"api_com.neu.monitorSys.feedback.controller.AqiFeedbackController.getFeedbackByGridId",
+	"mark":false,
+	"module":"feedback-server",
 	"name":"根据网格id查询反馈信息（待处理的信息以及正在处理的信息）",
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
@@ -28,12 +30,46 @@
 		"postType":"json",
 		"preScript":"",
 		"returnDocument":"{\"statusCode\":\"No comment,Type =Number\",\"message\":\"No comment,Type =String\",\"data\":{}}",
+		"returnTypeParamMap":{
+			"return":{
+				"customFlag":2,
+				"enabled":true,
+				"key":"return",
+				"type":"Object",
+				"value":{
+					"statusCode":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"statusCode",
+						"type":"Number",
+						"value":1
+					},
+					"message":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"message",
+						"type":"String",
+						"value":"message_o6gix"
+					},
+					"data":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"data",
+						"type":"Object",
+						"value":{}
+					}
+				}
+			}
+		},
 		"tempId":"",
 		"url":"/api/v1/feedbacks/waiting-list",
 		"urlEncodedKeyValueListJson":"[]",
 		"urlEncodedKeyValueListText":"",
-		"urlParamsKeyValueListJson":"[{\"comment\":\"页数\",\"customFlag\":2,\"enabled\":true,\"key\":\"page\",\"type\":\"Number\",\"value\":\"1\"},{\"comment\":\"每页大小\",\"customFlag\":2,\"enabled\":true,\"key\":\"size\",\"type\":\"Number\",\"value\":\"10\"}]",
-		"urlParamsKeyValueListText":"page=1\n&size=10"
+		"urlParamsKeyValueListJson":"[{\"comment\":\"\",\"customFlag\":2,\"enabled\":true,\"key\":\"finish\",\"type\":\"Number\",\"value\":\"1\"},{\"comment\":\"页数\",\"customFlag\":2,\"enabled\":true,\"key\":\"page\",\"type\":\"Number\",\"value\":\"1\"},{\"comment\":\"每页大小\",\"customFlag\":2,\"enabled\":true,\"key\":\"size\",\"type\":\"Number\",\"value\":\"10\"}]",
+		"urlParamsKeyValueListText":"finish=1\n&page=1\n&size=10"
 	},
 	"pmRequestId":"",
 	"pmResponseId":"",

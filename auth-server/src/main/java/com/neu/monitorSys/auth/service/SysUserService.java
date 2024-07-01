@@ -1,8 +1,8 @@
 package com.neu.monitorSys.auth.service;
 
-import com.neu.monitorSys.entity.DTO.SysUserDTO;
-import com.neu.monitorSys.entity.Member;
-import com.neu.monitorSys.entity.SysUser;
+import com.neu.monitorSys.auth.DTO.ModifyPasswordDTO;
+import com.neu.monitorSys.common.DTO.SysUserDTO;
+import com.neu.monitorSys.common.entity.SysUser;
 
 
 public interface SysUserService {
@@ -27,4 +27,22 @@ public interface SysUserService {
      */
     boolean savePublicUser(SysUserDTO userDTO);
 
+    /**
+     * 修改密码
+     * @param modifyPasswordDTO 修改密码信息
+     * @param logId 登录id
+     * @return 是否修改成功
+     */
+    boolean modifyPassword(ModifyPasswordDTO modifyPasswordDTO, String logId);
+
+    /**
+     * 保存普通用户
+     * @param userDTO 用户信息
+     * @return 是否保存成功
+     */
+    boolean saveNormalUser(SysUserDTO userDTO);
+    /**
+     * 重置密码
+     */
+    boolean reversePassword(String logId);
 }

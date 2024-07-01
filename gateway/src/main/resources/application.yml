@@ -1,23 +1,29 @@
 server:
   port: 8002
+  compression:
+    enabled: true
+    mime-types: application/json, application/xml, text/html, text/xml, text/plain
+    min-response-size: 1024
+
 auth:
   white-list:
-    - /api/v1/auth/login
-    - /api/v1/auth/login/mobile
-    - /auth/logout
-    - /api/v1/auth/public/register
-    - /api/v1/code/sms
+    - /api/v1/auth/login #密码登录
+    - /api/v1/auth/login/mobile  #手机验证码登录
+    - /api/v1/auth/public/register  #注册
+    - /api/v1/code/sms #获取短信验证码
+    - /api/v1/auth/normal/register #普通注册
 #    - /auth/refresh
 #    - /auth/verify
 spring:
   application:
     name: gateway
-#  data:
-#    redis:
-#      host: 192.168.92.128
-#      port: 6379
-#      timeout: 1800000
-#      password: cht021125
+
+  #  data:
+  #    redis:
+  #      host: 192.168.92.128
+  #      port: 6379
+  #      timeout: 1800000
+  #      password: cht021125
   main:
     web-application-type: reactive
   config:
@@ -31,6 +37,10 @@ spring:
       config:
         server-addr: 192.168.244.128:8848
     gateway:
+      httpclient:
+        pool:
+          max-connections: 1000
+          acquire-timeout: 5000
       discovery:
         locator:
           enabled: true
@@ -39,7 +49,7 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-               - "http://localhost:5173"
+              - "http://localhost:5173"
             allowedMethods:
               - GET
               - POST
@@ -55,15 +65,28 @@ spring:
         - id: auth
           uri: lb://auth-server
           predicates:
-                - Path=/api/v1/auth/**
+            - Path=/api/v1/auth/**,/api/v1/code/**
         - id: feedback
           uri: lb://feedback-server
           predicates:
-                - Path=/api/v1/feedbacks/**
+            - Path=/api/v1/feedbacks/**
         - id: user
           uri: lb://user-server
           predicates:
-                - Path=/api/v1/members/**,/api/v1/grid-managers/**
+            - Path=/api/v1/members/**,/api/v1/grid-managers/**
+        - id: statistics
+          uri: lb://statistics-server
+          predicates:
+            - Path=/api/v1/statistics/**
+        - id: aqi
+          uri: lb://aqi-server
+          predicates:
+            - Path=/api/v1/aqi/**
+        - id: roles
+          uri: lb://role-server
+          predicates:
+            - Path=/api/v1/roles/**,/api/v1/permissions/**
+
 
 
 

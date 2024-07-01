@@ -1,8 +1,7 @@
 package com.neu.monitorSys.auth.mapper;
 
-import com.neu.monitorSys.entity.Member;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.neu.monitorSys.entity.SysUser;
+import com.neu.monitorSys.common.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

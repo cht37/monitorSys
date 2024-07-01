@@ -598,6 +598,22 @@ public final class RedisUtil {
     }
 
     /**
+     * 获取 sorted set 最后一个元素的分数
+     *
+     * @param key sorted set 的键
+     * @return 最后一个元素的分数，若 sorted set 为空则返回 null
+     */
+    public Double getLastElementScore(String key) {
+        // 通过 reverse range 只获取最后一个元素
+        Set<Object> elements = redisTemplate.opsForZSet().reverseRange(key, 0, 0);
+        if (elements == null || elements.isEmpty()) {
+            return null;
+        }
+        Object lastElement = elements.iterator().next();
+        return redisTemplate.opsForZSet().score(key, lastElement);
+    }
+
+    /**
      * 获取Sorted Set的元素数量
      *
      * @param key 键
@@ -632,7 +648,7 @@ public final class RedisUtil {
     /**
      * 从Sorted Set删除元素
      *
-     * @param key   键
+     * @param key    键
      * @param values 值
      * @return 删除的个数
      */

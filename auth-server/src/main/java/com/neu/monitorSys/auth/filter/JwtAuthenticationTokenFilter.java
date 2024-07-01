@@ -8,12 +8,12 @@ import com.neu.monitorSys.auth.constants.AuthRedisPrefix;
 import com.neu.monitorSys.auth.entity.CustomUserDetails;
 import com.neu.monitorSys.auth.utils.JwtUtil;
 import com.neu.monitorSys.auth.utils.RedisUtil;
+import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Component
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
     private AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -47,17 +47,20 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             Map<String, Object> payLoad = JwtUtil.getPayLoad(token);
             username = (String) payLoad.get("logId");
         } catch (ParseException e) {
-            throw new RuntimeException("Token is invalid");
+            filterChain.doFilter(request, response);
         }
         //从redis中获取用户信息
         String key = AuthRedisPrefix.USER_CUSTOM_DETAIL_PREFIX + username;
         if (!redisUtil.hasKey(key)) {
-            throw new RuntimeException("服务器异常登录失败");
+            filterChain.doFilter(request, response);
+        }
+        if (redisUtil.get(key) == null) {
+            filterChain.doFilter(request, response);
         }
         String UserDetailJsonStr = redisUtil.get(key).toString();
         CustomUserDetails customUserDetails = JSONUtil.toBean(UserDetailJsonStr, CustomUserDetails.class, true);
         //普通用户，无权限信息
-        UsernamePasswordAuthenticationToken authentication = null;
+        UsernamePasswordAuthenticationToken authentication;
         if (customUserDetails.getAuthorities() == null) {
             authentication =
                     new UsernamePasswordAuthenticationToken(customUserDetails, null, null);
@@ -69,13 +72,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             //认证信息存入redis,键为线程id
             //获取当前线程id
             long threadId = Thread.currentThread().getId();
-            redisUtil.set(AuthRedisPrefix.USER_AUTHENTICATION_PREFIX+threadId,JSONUtil.toJsonStr(customUserDetails ));
+            redisUtil.set(AuthRedisPrefix.USER_AUTHENTICATION_PREFIX + threadId, JSONUtil.toJsonStr(customUserDetails), AuthConfig.tokenExpireTime);
 
-            System.out.println(SecurityContextHolder.getContext().getAuthentication().toString());
+//            System.out.println(SecurityContextHolder.getContext().getAuthentication().toString());
             //放行
             filterChain.doFilter(request, response);
         }
     }
+
     private boolean isWhitelist(HttpServletRequest request) {
         String contextPath = request.getContextPath();
         String filterPath = request.getRequestURI();

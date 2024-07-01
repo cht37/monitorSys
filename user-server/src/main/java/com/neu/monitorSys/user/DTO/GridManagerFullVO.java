@@ -1,15 +1,15 @@
 package com.neu.monitorSys.user.DTO;
 
-import com.neu.monitorSys.entity.DTO.MemberWithRole;
-import com.neu.monitorSys.entity.Member;
+import com.neu.monitorSys.common.entity.Member;
 import lombok.Data;
-
-import java.sql.Date;
 
 @Data
 public class GridManagerFullVO {
+    //基本信息
     private Member member;
+    //网格id
     private Integer areaId;
+    //反馈id
     private Integer afId;
     //省
     private String provinceName;

@@ -2,6 +2,7 @@ package com.neu.monitorSys.statistics.VO;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.neu.monitorSys.common.DTO.AqiDTO;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -50,8 +51,11 @@ public class StatisticsVO {
     /**
      * S02级别
      */
-    private String s02Level;
-
+    private AqiDTO s02Level;
+    /**
+     * so2_aqi
+     */
+    private Integer so2Aqi;
 
     /**
      * 实测空气一氧化碳浓度（mg/m3）
@@ -60,8 +64,11 @@ public class StatisticsVO {
     /**
      * CO级别
      */
-    private String coLevel;
-
+    private AqiDTO coLevel;
+    /**
+     * co_aqi
+     */
+    private Integer coAqi;
 
     /**
      * 实测空气悬浮颗粒物浓度（μg/m3）
@@ -71,17 +78,20 @@ public class StatisticsVO {
     /**
      * SPM级别
      */
-    private String spmLevel;
-
+    private AqiDTO spmLevel;
+    /**
+     * spm_aqi
+     */
+    private Integer spmAqi;
 
     /**
-     * 实测空气质量指数
+     * 最大空气质量指数
      */
     private Integer aqi;
     /**
      * 空气质量级别
      */
-    private String aqiLevel;
+    private AqiDTO aqiLevel;
 
     /**
      * 确认日期

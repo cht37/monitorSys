@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.neu.monitorSys.geography.DTO.AreaMQDTO;
 import com.neu.monitorSys.geography.DTO.AreaDTO;
 import com.neu.monitorSys.geography.DTO.GeographyVO;
-import com.neu.monitorSys.entity.GridManagerArea;
+import com.neu.monitorSys.common.entity.GridManagerArea;
 import com.neu.monitorSys.geography.mapper.GridManagerAreaMapper;
 import com.neu.monitorSys.geography.service.ICitiesService;
 import com.neu.monitorSys.geography.service.IDistrictService;
@@ -83,6 +83,22 @@ public class GridManagerAreaServiceImpl extends ServiceImpl<GridManagerAreaMappe
     public Integer getGridIdByGridName(String gridName) {
         LambdaQueryWrapper<GridManagerArea> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(GridManagerArea::getAreaName, gridName);
+        GridManagerArea gridManagerArea = gridManagerAreaMapper.selectOne(wrapper);
+        if (gridManagerArea == null) {
+            return null;
+        }
+        return gridManagerArea.getId();
+    }
+
+    /**
+     * 通过网格地址模糊查询获取网格Id
+     * @param gridName 网格名称
+     * @return 网格Id
+     */
+    @Override
+    public Integer getGridIdByGridNameLike(String gridName) {
+        LambdaQueryWrapper<GridManagerArea> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(GridManagerArea::getAreaName, gridName);
         GridManagerArea gridManagerArea = gridManagerAreaMapper.selectOne(wrapper);
         if (gridManagerArea == null) {
             return null;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @Order(-1)
@@ -578,5 +579,101 @@ public final class RedisUtil {
             return 0;
         }
     }
+
+    /**
+     * 添加元素到Sorted Set
+     *
+     * @param key   键
+     * @param value 值
+     * @param score 分数
+     * @return true成功 false失败
+     */
+    public boolean zAdd(String key, Object value, double score) {
+        try {
+            return redisTemplate.opsForZSet().add(key, value, score);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 获取 sorted set 最后一个元素的分数
+     *
+     * @param key sorted set 的键
+     * @return 最后一个元素的分数，若 sorted set 为空则返回 null
+     */
+    public Double getLastElementScore(String key) {
+        // 通过 reverse range 只获取最后一个元素
+        Set<Object> elements = redisTemplate.opsForZSet().reverseRange(key, 0, 0);
+        if (elements == null || elements.isEmpty()) {
+            return null;
+        }
+        Object lastElement = elements.iterator().next();
+        return redisTemplate.opsForZSet().score(key, lastElement);
+    }
+
+    /**
+     * 获取Sorted Set的元素数量
+     *
+     * @param key 键
+     * @return 元素数量
+     */
+    public long zCard(String key) {
+        try {
+            return redisTemplate.opsForZSet().zCard(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 分页获取Sorted Set的元素
+     *
+     * @param key   键
+     * @param start 开始位置
+     * @param end   结束位置
+     * @return 元素集合
+     */
+    public Set<Object> zRange(String key, long start, long end) {
+        try {
+            return redisTemplate.opsForZSet().range(key, start, end);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 从Sorted Set删除元素
+     *
+     * @param key    键
+     * @param values 值
+     * @return 删除的个数
+     */
+    public long zRemove(String key, Object... values) {
+        try {
+            return redisTemplate.opsForZSet().remove(key, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    // 分页查询封装
+    public List<Object> findByPage(String key, String dataKey, int page, int size) {
+        long start = (long) (page - 1) * size;
+        long end = start + size - 1;
+        Set<Object> ids = zRange(key, start, end);
+        if (CollectionUtils.isEmpty(ids)) {
+            return null;
+        }
+        return (List<Object>) redisTemplate.opsForHash().multiGet(dataKey, ids)
+                .stream()
+                .filter(obj -> obj != null)
+                .collect(Collectors.toList());
+    }
+
 }
 

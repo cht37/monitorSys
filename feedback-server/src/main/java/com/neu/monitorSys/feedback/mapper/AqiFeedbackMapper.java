@@ -1,6 +1,6 @@
 package com.neu.monitorSys.feedback.mapper;
 
-import com.neu.monitorSys.entity.AqiFeedback;
+import com.neu.monitorSys.common.entity.AqiFeedback;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

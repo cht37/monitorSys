@@ -1,7 +1,7 @@
 package com.neu.monitorSys.feedback.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.neu.monitorSys.entity.AqiFeedback;
+import com.neu.monitorSys.common.entity.AqiFeedback;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.neu.monitorSys.feedback.DTO.AqiFeedBackVO;
 import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
@@ -45,7 +45,7 @@ public interface IAqiFeedbackService extends IService<AqiFeedback> {
      * @param size 每页大小
      * @return 反馈记录
      */
-    IPage<AqiFeedBackVO> getFeedbackByGridId(String gridId, int page, int size);
+    IPage<AqiFeedBackVO> getFeedbackByGridId(String gridId,Integer isFinished, int page, int size);
     /**
      * 设置反馈网格员（指派）
      */
@@ -71,6 +71,11 @@ public interface IAqiFeedbackService extends IService<AqiFeedback> {
      * @return
      */
     IPage<AqiFeedBackVO> getFeedBackByConditions(FeedbackQueryDTO feedbackQueryDTO, int page, int size );
+
+    /**
+     * 根据logId获取Feedback信息
+     */
+    AqiFeedBackVO getCurrentFeedback(String logId);
 
 
 }

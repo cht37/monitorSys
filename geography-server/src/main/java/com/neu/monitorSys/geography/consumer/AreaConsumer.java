@@ -1,5 +1,6 @@
 package com.neu.monitorSys.geography.consumer;
 
+import com.neu.monitorSys.common.config.RabbitMQCommonConfig;
 import com.neu.monitorSys.geography.DTO.AreaMQDTO;
 import com.neu.monitorSys.geography.service.IGridManagerAreaService;
 import lombok.extern.log4j.Log4j2;
@@ -17,11 +18,11 @@ public class AreaConsumer {
     @Autowired
     private IGridManagerAreaService gridManagerAreaService;
 
-    /**
-     * 接收区域信息，写入数据库
-     * @param area
-     */
-//    @RabbitListener(queues = "areaQueue",errorHandler = "rabbitMQErrorHandler")
+//    /**
+//     * 接收区域信息，写入数据库
+//     * @param area
+//     */
+    @RabbitListener(queues = RabbitMQCommonConfig.AREA_QUEUE,errorHandler = "rabbitMQErrorHandler")
     @Transactional
     public void receiveArea(AreaMQDTO area) {
         Boolean aBoolean = gridManagerAreaService.saveAreaByMQ(area);

@@ -1,6 +1,7 @@
 package com.neu.monitorSys.feedback.publisher;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.neu.monitorSys.common.config.RabbitMQCommonConfig;
 import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
 import com.neu.monitorSys.feedback.DTO.AreaMQDTO;
 import com.neu.monitorSys.feedback.client.UserClient;
@@ -16,16 +17,21 @@ public class FeedbackPublisher {
     @Autowired
     private UserClient userClient;
 
+    /**
+     * 发送反馈信息到消息队列
+     * @param feedback 反馈信息
+     * @return 是否发送成功
+     */
     public boolean sendFeedback(AqiFeedbackDTO feedback){
         try {
-            rabbitTemplate.convertAndSend("feedbackExchange","topic.feedback",feedback);
+            rabbitTemplate.convertAndSend(RabbitMQCommonConfig.FEEDBACK_EXCHANGE,"topic.feedback",feedback);
             AreaMQDTO areaMQDTO =new AreaMQDTO();
             BeanUtil.copyProperties(feedback,areaMQDTO);
             //判断是否有字段为空
             if(areaMQDTO.getProvinceName()==null||areaMQDTO.getCityName()==null||areaMQDTO.getDistrictName()==null){
                 return false;
             }
-            rabbitTemplate.convertAndSend("feedbackExchange","topic.area",areaMQDTO);
+            rabbitTemplate.convertAndSend(RabbitMQCommonConfig.FEEDBACK_EXCHANGE,"topic.area",areaMQDTO);
         } catch (AmqpException e) {
             return false;
         }
@@ -33,13 +39,18 @@ public class FeedbackPublisher {
 
     }
 
-    //指派给区域管理员，异步请求，停用
-//    public boolean sendAssignTASK(AssignDTO assignDTO){
-//        try {
-//            rabbitTemplate.convertAndSend("assignExchange","topic.assign",assignDTO);
-//        } catch (AmqpException e) {
-//            return false;
-//        }
-//        return true;
-//    }
+    /**
+     * 发送反馈刷新通知
+     *
+     * @param clientId 用户id
+     * @param msg      通知内容
+     */
+    public void sendFeedbackNotify(String msg) {
+        try {
+            //向正在监听的用户发送消息
+            rabbitTemplate.convertAndSend(RabbitMQCommonConfig.FEEDBACK_NOTIFICATION_EXCHANGE, "msg.feedback",   msg);
+        } catch (AmqpException e) {
+            throw new RuntimeException("发送消息失败");
+        }
+    }
 }

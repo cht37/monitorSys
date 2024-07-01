@@ -2,7 +2,7 @@ package com.neu.monitorSys.auth.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.neu.monitorSys.auth.constants.ResultCode;
-import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.common.DTO.MyResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

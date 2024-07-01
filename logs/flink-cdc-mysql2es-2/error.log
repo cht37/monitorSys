@@ -1,0 +1,48 @@
+20:37:35.562 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - [report,40] - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+No spring.config.import property has been defined
+
+Action:
+
+Add a spring.config.import=nacos: property to your configuration.
+	If configuration is not required add spring.config.import=optional:nacos: instead.
+	To disable this check, set spring.cloud.nacos.config.import-check.enabled=false.
+
+20:39:10.997 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - [report,40] - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+No spring.config.import property has been defined
+
+Action:
+
+Add a spring.config.import=nacos: property to your configuration.
+	If configuration is not required add spring.config.import=optional:nacos: instead.
+	To disable this check, set spring.cloud.nacos.config.import-check.enabled=false.
+
+20:41:09.962 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - [report,40] - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+No spring.config.import property has been defined
+
+Action:
+
+Add a spring.config.import=nacos: property to your configuration.
+	If configuration is not required add spring.config.import=optional:nacos: instead.
+	To disable this check, set spring.cloud.nacos.config.import-check.enabled=false.
+

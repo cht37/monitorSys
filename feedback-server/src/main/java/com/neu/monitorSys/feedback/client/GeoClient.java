@@ -1,7 +1,7 @@
 package com.neu.monitorSys.feedback.client;
 
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.DTO.AreaDTO;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.DTO.AreaDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

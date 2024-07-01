@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.neu.monitorSys.entity.District;
+import com.neu.monitorSys.common.entity.District;
 
 public interface IDistrictService extends IService<District> {
     /**

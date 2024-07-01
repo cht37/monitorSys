@@ -7,8 +7,8 @@
     <file url="file://$PROJECT_DIR$/auth-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/authorityManager/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/authorityManager/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/entity-module/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/entity-module/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common-module/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common-module/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/feedback-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/feedback-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/flink-server/src/main/java" charset="UTF-8" />
@@ -21,6 +21,8 @@
     <file url="file://$PROJECT_DIR$/grid-manage-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mq-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mq-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notification-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notification-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/role-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/role-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />

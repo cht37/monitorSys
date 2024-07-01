@@ -1,27 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="fastRequestCurrentParamGroup">
-    <option name="clasDescription" value="&lt;p&gt; 公众监督反馈表 前端控制器 &lt;/p&gt;" />
-    <option name="className" value="com.neu.monitorSys.feedback.controller.AqiFeedbackController" />
-    <option name="filePath" value="/.fastRequest/collections/Root/feedback-server/AqiFeedbackController~getFeedbackByGridId.rapi" />
-    <option name="method" value="getFeedbackByGridId" />
-    <option name="methodDescription" value="根据网格id查询反馈信息（待处理的信息以及正在处理的信息）" />
-    <option name="module" value="feedback-server" />
-    <option name="originUrl" value="/api/v1/feedbacks/waiting-list" />
-    <option name="requestParamMap">
-      <map>
-        <entry key="page">
-          <value>
-            <Object />
-          </value>
-        </entry>
-        <entry key="size">
-          <value>
-            <Object />
-          </value>
-        </entry>
-      </map>
-    </option>
+    <option name="clasDescription" value="&lt;p&gt; 前端控制器 &lt;/p&gt;" />
+    <option name="className" value="com.neu.monitorSys.statistics.controller.StatisticsController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/statistics-server/StatisticsController~getProvinceAqiStatistics.rapi" />
+    <option name="method" value="getProvinceAqiStatistics" />
+    <option name="methodDescription" value="获取省级空气质量统计信息" />
+    <option name="module" value="statistics-server" />
+    <option name="originUrl" value="/api/v1/statistics/province" />
     <option name="responseParamMap">
       <map>
         <entry key="return">
@@ -33,6 +19,6 @@
     </option>
     <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
     <option name="tempId" value="" />
-    <option name="url" value="/api/v1/feedbacks/waiting-list" />
+    <option name="url" value="/api/v1/statistics/province" />
   </component>
 </project>

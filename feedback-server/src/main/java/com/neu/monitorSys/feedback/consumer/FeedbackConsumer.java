@@ -1,5 +1,6 @@
 package com.neu.monitorSys.feedback.consumer;
 
+import com.neu.monitorSys.common.config.RabbitMQCommonConfig;
 import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
 import com.neu.monitorSys.feedback.service.IAqiFeedbackService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,7 +14,7 @@ public class FeedbackConsumer {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private IAqiFeedbackService aqiFeedbackService;
-    @RabbitListener(queues = "feedbackQueue",errorHandler = "rabbitMQErrorHandler")
+    @RabbitListener(queues = RabbitMQCommonConfig.FEEDBACK_QUEUE,errorHandler = "rabbitMQErrorHandler")
     public void receiveFeedback(AqiFeedbackDTO feedback){
         aqiFeedbackService.saveFeedback(feedback);
     }

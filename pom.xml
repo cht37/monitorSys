@@ -12,13 +12,13 @@
         <module>auth-server</module>
         <module>gateway</module>
         <module>user-server</module>
-        <module>flink-server</module>
         <module>role-server</module>
         <module>geography-server</module>
-        <module>entity-module</module>
+        <module>common-module</module>
         <module>feedback-server</module>
         <module>statistics-server</module>
         <module>aqi-server</module>
+        <module>notification-server</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -98,6 +98,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Required to use PATCH -->
+            <!-- 解决 FeignClient PATCH 无法调用问题-->
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -105,7 +107,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>1.18.22</version>
         </dependency>
         <!-- Nacos 服务发现 -->
         <dependency>

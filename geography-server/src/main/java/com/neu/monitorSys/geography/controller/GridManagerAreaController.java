@@ -3,8 +3,8 @@ package com.neu.monitorSys.geography.controller;
 
 import com.neu.monitorSys.geography.DTO.AreaDTO;
 import com.neu.monitorSys.geography.DTO.GeographyVO;
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.constants.ResultCode;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.ResultCode;
 import com.neu.monitorSys.geography.service.IGridManagerAreaService;
 import org.apache.ibatis.jdbc.Null;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +54,20 @@ public class GridManagerAreaController {
     @GetMapping("/grid-id")
     public MyResponse<Integer> getGridIdByGridName(@RequestParam String gridName) {
         Integer gridId = gridManagerAreaService.getGridIdByGridName(gridName);
+        if (gridId != null) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", gridId);
+        }
+        return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "fail", null);
+    }
+
+    /**
+     * 通过网格地址模糊查询获取网格Id
+     * @param gridName
+     * @return
+     */
+    @GetMapping("/grid-id-like")
+    public MyResponse<Integer> getGridIdByGridNameLike(@RequestParam String gridName) {
+        Integer gridId = gridManagerAreaService.getGridIdByGridNameLike(gridName);
         if (gridId != null) {
             return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", gridId);
         }

@@ -1,8 +1,12 @@
 package com.neu.monitorSys.user.service;
 
-import com.neu.monitorSys.entity.Member;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.neu.monitorSys.common.entity.Member;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.neu.monitorSys.entity.DTO.MemberWithRole;
+import com.neu.monitorSys.common.DTO.MemberWithRole;
+import com.neu.monitorSys.user.DTO.MemberSearchDTO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,6 +27,10 @@ public interface IMemberService extends IService<Member> {
     MemberWithRole getMemberWithRole(String logId);
 
     /**
+     * 查询用户信息
+     */
+    IPage<MemberWithRole> selectMembers(MemberSearchDTO memberSearchDTO, Integer page, Integer size);
+    /**
      * 获取用户基本信息
      */
     Member getMember(String logId);
@@ -41,12 +49,34 @@ public interface IMemberService extends IService<Member> {
     /**
      * 根据登录id获取角色id
      */
-    Integer getRoleIdByLogId(String logId);
+    List<Integer> getRoleIdByLogId(String logId);
 
     /**
      * 新增用户Member
      */
     void saveMember(Member member);
 
+    /**
+     * 是否是新用户
+     * @param logId 用户登录id
+     * @return 是否是新用户
+     */
+    boolean isNewMember(String logId);
+
+    /**
+     * 设置为不是新用户
+     * @param logId 用户登录id
+     * @return 是否设置成功
+     */
+    boolean setIsNew(String logId);
+
+    /**
+     * 禁用用户
+     */
+    boolean disableMember(String logId,String currentLogId);
+    /**
+     * 启用用户
+     */
+    boolean enableMember(String logId,String currentLogId);
 
 }

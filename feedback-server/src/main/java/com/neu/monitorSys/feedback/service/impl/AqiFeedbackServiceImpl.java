@@ -2,16 +2,14 @@ package com.neu.monitorSys.feedback.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.AqiFeedback;
-import com.neu.monitorSys.feedback.DTO.AqiFeedBackVO;
-import com.neu.monitorSys.feedback.DTO.AqiFeedbackDTO;
-import com.neu.monitorSys.feedback.DTO.AssignDTO;
-import com.neu.monitorSys.feedback.DTO.FeedbackQueryDTO;
+import com.neu.monitorSys.common.entity.AqiFeedback;
+import com.neu.monitorSys.feedback.DTO.*;
 import com.neu.monitorSys.feedback.client.GeoClient;
 import com.neu.monitorSys.feedback.client.UserClient;
 import com.neu.monitorSys.feedback.mapper.AqiFeedbackMapper;
@@ -28,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -173,14 +172,38 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
     }
 
     @Override
-    public IPage<AqiFeedBackVO> getFeedbackByGridId(String gridId, int page, int size) {
+    public IPage<AqiFeedBackVO> getFeedbackByGridId(String gridId, Integer isFinished, int page, int size) {
         // 分页通过 gridId 查询反馈记录
         LambdaQueryWrapper<AqiFeedback> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<AqiFeedback> handleWrapper;
+        AqiFeedback firstFeedback = null;
+        if (isFinished != null) {
+            if (isFinished == 0) {
+                wrapper.eq(AqiFeedback::getState, 1);
+                handleWrapper = new LambdaQueryWrapper<>();
+                handleWrapper.eq(AqiFeedback::getState, 2);
+                handleWrapper.eq(AqiFeedback::getGmId, gridId);
+                firstFeedback = aqiFeedbackMapper.selectOne(handleWrapper);
+            } else if (isFinished == 1) {
+                wrapper.eq(AqiFeedback::getState, 3);
+            }
+        }
         wrapper.eq(AqiFeedback::getGmId, gridId);
         //assignDate由大到小排序
         wrapper.orderByDesc(AqiFeedback::getAssignDate);
         Page<AqiFeedback> aqiFeedbackPage = new Page<>(page, size);
         IPage<AqiFeedback> aqiFeedbackList = aqiFeedbackMapper.selectPage(aqiFeedbackPage, wrapper);
+        //如果有正在处理的反馈记录，将其放在第一位
+        if (firstFeedback != null) {
+            List<AqiFeedback> records = aqiFeedbackList.getRecords();
+            if (records.isEmpty()) {
+                records = new ArrayList<>();
+                records.add(firstFeedback);
+            } else {
+                records.add(0, firstFeedback);
+            }
+            aqiFeedbackList.setRecords(records);
+        }
         // 使用 CompletableFuture 并行处理每个反馈记录
         List<AqiFeedBackVO> feedbackFullDTOList = getAqiFeedBackVOS(aqiFeedbackList.getRecords());
         // 构造并返回包含完整DTO数据的分页结果
@@ -294,6 +317,10 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
                 aqiFeedbackRepository.updateFeedbackData(aqiFeedback);
             }
         }
+        NotifyDTO notifyDTO = new NotifyDTO();
+        notifyDTO.setRequireRefresh(true);
+        notifyDTO.setMsg("反馈成功");
+        feedbackPublisher.sendFeedbackNotify(JSONUtil.toJsonStr(notifyDTO));
         return i == 1;
     }
 
@@ -310,8 +337,7 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         LambdaQueryWrapper<AqiFeedback> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByDesc(AqiFeedback::getAfId);
         //查询前num条记录
-        List<AqiFeedback> aqiFeedbacks = aqiFeedbackMapper.selectList(wrapper.last("limit " + num));
-        return aqiFeedbacks;
+        return aqiFeedbackMapper.selectList(wrapper.last("limit " + num));
 
     }
 
@@ -324,11 +350,16 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
     @Transactional
     public Boolean updateFeedbackState(Integer afId, Integer state) {
         UpdateWrapper<AqiFeedback> wrapper = new UpdateWrapper<>();
+        //获取当前时间
+        long current = DateUtil.current();
         wrapper.eq("af_id", afId);
         wrapper.set("state", state);
+        wrapper.set("confirm_datetime", DateUtil.format(new Date(current), "yyyy-MM-dd HH:mm:ss"));
         int i = 0;
         try {
             i = aqiFeedbackMapper.update(wrapper);
+            //修改redis中的数据
+            aqiFeedbackRepository.updateFeedbackData(aqiFeedbackMapper.selectById(afId));
         } catch (Exception e) {
             throw new RuntimeException("修改失败" + e.getMessage());
         }
@@ -352,24 +383,33 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         }
         //如果省市区名称不为空
         if (feedbackQueryDTO.getProvinceName() != null || feedbackQueryDTO.getCityName() != null || feedbackQueryDTO.getDistrictName() != null) {
-            //获取省份编号
-            String provinceId = (String) geoClient.getProvinceId(feedbackQueryDTO.getProvinceName()).getData();
-            if (provinceId == null || provinceId.equals("")) {
-                return null;
+            String provinceId = null;
+            if (feedbackQueryDTO.getProvinceName() != null) {
+                //获取省份编号
+                provinceId = (String) geoClient.getProvinceId(feedbackQueryDTO.getProvinceName()).getData();
+                if (provinceId == null || provinceId.equals("")) {
+                    return null;
+                }
+                wrapper.eq(AqiFeedback::getProvinceId, provinceId);
             }
-            //获取城市编号
-            String cityId = (String) geoClient.getCityIdByProvinceId(feedbackQueryDTO.getCityName(), provinceId).getData();
-            if (cityId == null || cityId.equals("")) {
-                return null;
+            String cityId = null;
+            if (feedbackQueryDTO.getCityName() != null && provinceId != null) {
+                //获取城市编号
+                cityId = (String) geoClient.getCityIdByProvinceId(feedbackQueryDTO.getCityName(), provinceId).getData();
+                if (cityId == null || cityId.equals("")) {
+                    return null;
+                }
+                wrapper.eq(AqiFeedback::getCityId, cityId);
             }
-            //获取区域编号
-            String districtId = (String) geoClient.getDistrictId(feedbackQueryDTO.getDistrictName(), cityId).getData();
-            if (districtId == null || districtId.equals("")) {
-                return null;
+            String districtId = null;
+            if (feedbackQueryDTO.getDistrictName() != null && cityId != null) {
+                //获取区域编号
+                districtId = (String) geoClient.getDistrictId(feedbackQueryDTO.getDistrictName(), cityId).getData();
+                if (districtId != null && !districtId.equals("")) {
+                    return null;
+                }
+                wrapper.eq(AqiFeedback::getDistrictId, districtId);
             }
-            wrapper.eq(AqiFeedback::getCityId, cityId);
-            wrapper.eq(AqiFeedback::getProvinceId, provinceId);
-            wrapper.eq(AqiFeedback::getDistrictId, districtId);
         }
         //地址
         if (feedbackQueryDTO.getAddress() != null) {
@@ -402,13 +442,13 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         //反馈日期排序
         if (feedbackQueryDTO.getAfDateAscending() != null && feedbackQueryDTO.getAfDateAscending()) {
             wrapper.orderByAsc(AqiFeedback::getAfDate);
-        } else if(feedbackQueryDTO.getAfDateAscending() != null) {
+        } else if (feedbackQueryDTO.getAfDateAscending() != null) {
             wrapper.orderByDesc(AqiFeedback::getAfDate);
         }
         //指派日期排序
         if (feedbackQueryDTO.getAssignDateAscending() != null && feedbackQueryDTO.getAssignDateAscending()) {
             wrapper.orderByAsc(AqiFeedback::getAssignDate);
-        } else if(feedbackQueryDTO.getAssignDateAscending()!=null){
+        } else if (feedbackQueryDTO.getAssignDateAscending() != null) {
             wrapper.orderByDesc(AqiFeedback::getAssignDate);
         }
         //同时满足条件
@@ -422,10 +462,10 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
             wrapper.eq(AqiFeedback::getState, feedbackQueryDTO.getAssignStatus());
         }
         //分页查询
-         Long total = aqiFeedbackMapper.selectCount(wrapper);
-        int pages = (int) (total / size)+1;
+        Long total = aqiFeedbackMapper.selectCount(wrapper);
+        int pages = (int) (total / size) + 1;
         //判断页数是否合法
-        if ( page<0|| page > pages ) {
+        if (page < 0 || page > pages) {
             throw new RuntimeException("页数不合法");
         }
 
@@ -439,6 +479,19 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         feedbackDTOPage.setTotal(total);
         feedbackDTOPage.setPages(pages);
         return feedbackDTOPage;
+    }
+
+    @Override
+    public AqiFeedBackVO getCurrentFeedback(String logId) {
+        Integer afId = userClient.getAfIdByLogId(logId).getData();
+        if (afId == null) {
+            throw new RuntimeException("当前无正在处理的指派");
+        }
+        AqiFeedback aqiFeedback = aqiFeedbackMapper.selectById(afId);
+        List<AqiFeedback> aqiFeedbacks = new ArrayList<>();
+        aqiFeedbacks.add(aqiFeedback);
+        List<AqiFeedBackVO> aqiFeedBackVOS = getAqiFeedBackVOS(aqiFeedbacks);
+        return aqiFeedBackVOS.get(0);
     }
 
 

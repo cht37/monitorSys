@@ -1,0 +1,87 @@
+{
+	"activeGroup":"Default",
+	"apiParamGroup":{},
+	"apifoxRequestId":188253868,
+	"childList":[],
+	"classDescription":"<p> 角色表 前端控制器 </p>",
+	"description":"",
+	"directory":"/.fastRequest/collections/Root/role-server/RolesController",
+	"domain":"http://localhost:8004",
+	"enableEnv":"local",
+	"enableProject":"role-server",
+	"filePath":"/.fastRequest/collections/Root/role-server/RolesController~updateUserRole.rapi",
+	"id":"api_com.neu.monitorSys.roleManage.controller.RolesController.updateUserRole",
+	"mark":false,
+	"module":"role-server",
+	"name":"修改用户角色",
+	"paramGroup":{
+		"bodyKeyValueListJson":"[\n  1\n]",
+		"classDescription":"<p> 角色表 前端控制器 </p>",
+		"className":"com.neu.monitorSys.roleManage.controller.RolesController",
+		"headerParamsKeyValueList":[],
+		"jsonDocument":"[\n  \"No comment,Value =1\"\n]",
+		"method":"updateUserRole",
+		"methodDescription":"修改用户角色",
+		"methodType":"PUT",
+		"multipartKeyValueListJson":"[]",
+		"originUrl":"/api/v1/roles/users/{logId}/roles",
+		"pathParamsKeyValueListJson":"[{\"comment\":\"用户id\",\"customFlag\":2,\"enabled\":true,\"key\":\"logId\",\"type\":\"String\",\"value\":\"logId_hqw15\"}]",
+		"postScript":"",
+		"postType":"json",
+		"preScript":"",
+		"returnDocument":"{\"statusCode\":\"No comment,Type =Number\",\"message\":\"No comment,Type =String\",\"data\":{\"java.lang.Boolean\":\"No comment,Type =Boolean\"}}",
+		"returnTypeParamMap":{
+			"return":{
+				"customFlag":2,
+				"enabled":true,
+				"key":"return",
+				"type":"Object",
+				"value":{
+					"statusCode":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"statusCode",
+						"type":"Number",
+						"value":1
+					},
+					"message":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"message",
+						"type":"String",
+						"value":"message_d34bg"
+					},
+					"data":{
+						"comment":"",
+						"customFlag":2,
+						"enabled":true,
+						"key":"data",
+						"type":"Object",
+						"value":{
+							"java.lang.Boolean":{
+								"comment":"",
+								"customFlag":2,
+								"enabled":true,
+								"key":"java.lang.Boolean",
+								"type":"Boolean",
+								"value":true
+							}
+						}
+					}
+				}
+			}
+		},
+		"tempId":"",
+		"url":"/api/v1/roles/users/{logId}/roles",
+		"urlEncodedKeyValueListJson":"[]",
+		"urlEncodedKeyValueListText":"",
+		"urlParamsKeyValueListJson":"[]",
+		"urlParamsKeyValueListText":""
+	},
+	"pmRequestId":"",
+	"pmResponseId":"",
+	"tempId":"api_com.neu.monitorSys.roleManage.controller.RolesController.updateUserRole",
+	"type":2
+}

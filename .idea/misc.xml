@@ -5,11 +5,13 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/flink-server/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/authorityManager/pom.xml" />
+        <option value="$PROJECT_DIR$/flink-server/pom.xml" />
         <option value="$PROJECT_DIR$/grid-manage-server/pom.xml" />
         <option value="$PROJECT_DIR$/mq-server/pom.xml" />
         <option value="$PROJECT_DIR$/untitled/pom.xml" />

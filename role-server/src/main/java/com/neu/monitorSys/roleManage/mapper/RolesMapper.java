@@ -1,15 +1,14 @@
 package com.neu.monitorSys.roleManage.mapper;
 
-import com.neu.monitorSys.entity.Roles;
+import com.neu.monitorSys.common.entity.Roles;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.neu.monitorSys.roleManage.VO.PermissionRoleMapVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -26,5 +25,12 @@ public interface RolesMapper extends BaseMapper<Roles> {
 
     @Insert("insert into user_role (user_id, role_id) values(#{param1}, #{param2})")
     void addUserRole(Integer userId,  Integer roleId) throws Exception;
+    @Delete("delete from user_role where user_id in(select id from sys_user where user_name = #{param1})")
+    void deleteUserRole(String logId);
+    @Insert("insert into user_role (user_id, role_id) values((select id from sys_user where user_name = #{param1}), #{param2})")
+    void addUserRoleByLogId(String logId,Integer roleId);
 
+    List<String> getLogIdByRoleNames(@Param("roleNameList") List<String> roleNameList);
+
+    List<String> getLogIdByRoleName(String roleName);
 }

@@ -1,7 +1,6 @@
 package com.neu.monitorSys.auth.DTO;
 
-import com.neu.monitorSys.entity.DTO.MemberWithRole;
-import com.neu.monitorSys.entity.Member;
+import com.neu.monitorSys.common.DTO.MemberWithRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

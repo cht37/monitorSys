@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.neu.monitorSys.entity.Provinces;
+import com.neu.monitorSys.common.entity.Provinces;
 import com.neu.monitorSys.geography.constants.GeoRedisPrefix;
 import com.neu.monitorSys.geography.mapper.ProvincesMapper;
 import com.neu.monitorSys.geography.service.IProvincesService;

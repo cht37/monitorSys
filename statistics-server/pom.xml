@@ -20,7 +20,7 @@
         <!--实体类模块        -->
         <dependency>
             <groupId>com.neu</groupId>
-            <artifactId>entity-module</artifactId>
+            <artifactId>common-module</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -54,6 +54,12 @@
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-lang</artifactId>
+                    <groupId>commons-lang</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -79,7 +85,20 @@
         <!--            <groupId>com.alibaba.cloud</groupId>-->
         <!--            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
         <!--        </dependency>-->
-
-
+        <!-- Required to use PATCH -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>4.3.2</version>  <!-- 这个版本需要跟es服务器匹配 此处应该为4.4.X 因为parent项目不在控制es版本必须适配 -->
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.13.2</version>
+        </dependency>
     </dependencies>
 </project>

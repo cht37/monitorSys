@@ -1,6 +1,6 @@
 package com.neu.monitorSys.gateway.client;
 
-import com.neu.monitorSys.entity.DTO.MyResponse;
+import com.neu.monitorSys.common.DTO.MyResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

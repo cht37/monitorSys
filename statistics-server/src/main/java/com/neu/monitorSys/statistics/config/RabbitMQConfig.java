@@ -9,25 +9,26 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 public class RabbitMQConfig {
-    /**
-     * 配置交换机，反馈信息交换机，用于接收反馈信息
-     * @return
-     */
-    @Bean
-    public FanoutExchange statisticsExchange(){
-        return new FanoutExchange("statisticsExchange");
-    }
+//    /**
+//     * 配置交换机，反馈信息交换机，用于接收反馈信息
+//     * @return
+//     */
+//    @Bean
+//    public FanoutExchange statisticsExchange(){
+//        return new FanoutExchange("statisticsExchange");
+//    }
 
-    /**
-     * 配置队列，数据队列
-     * @return
-     */
-    @Bean
-    public Queue dataQueue(){
-        return new Queue("dataQueue");
-    }
+//    /**
+//     * 配置队列，数据队列
+//     * @return
+//     */
+//    @Bean
+//    public Queue dataQueue(){
+//        return new Queue("dataQueue");
+//    }
 //TODO 配置死信队列
 
 //    /**
@@ -39,15 +40,6 @@ public class RabbitMQConfig {
 //    }
 
 
-
-    /**
-     * 绑定指派任务队列
-     * @return
-     */
-    @Bean
-    public Binding bindingTopic3(@Qualifier("dataQueue") Queue queue, @Qualifier("statisticsExchange") FanoutExchange fanoutExchange){
-        return BindingBuilder.bind(queue).to(fanoutExchange);
-    }
     //配置消息转换器
     @Bean
     public MessageConverter messageConverter(){

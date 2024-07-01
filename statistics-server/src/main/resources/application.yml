@@ -1,6 +1,9 @@
 server:
   port: 8007
 spring:
+  elasticsearch:
+    uris: http://192.168.244.128:9200
+
   application:
     name: statistics-server
 #  datasource:
@@ -12,6 +15,9 @@ spring:
     restart:
       enabled: true #是否支持热部署cloud:
   cloud:
+    openfeign:
+      okhttp:
+        enabled: true
     nacos:
       username: nacos
       password: nacos
@@ -21,5 +27,3 @@ spring:
         server-addr: 192.168.244.128:8848
   config:
     import: nacos:database.yaml, nacos:rabbitmq.yaml, nacos:redis.yaml,nacos:seata.yaml
-
-

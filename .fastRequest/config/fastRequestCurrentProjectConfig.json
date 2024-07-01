@@ -77,6 +77,33 @@
 				}
 			],
 			"name":"feedback-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8080"
+				}
+			],
+			"name":"statistics-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8080"
+				}
+			],
+			"name":"aqi-server"
+		},
+		{
+			"hostGroup":[
+				{
+					"env":"local",
+					"url":"http://localhost:8080"
+				}
+			],
+			"name":"notification-server"
 		}
 	],
 	"envList":[
@@ -96,7 +123,10 @@
 		"role-server",
 		"user-server",
 		"geography-server",
-		"feedback-server"
+		"feedback-server",
+		"statistics-server",
+		"aqi-server",
+		"notification-server"
 	],
 	"syncModel":{
 		"branch":"master",

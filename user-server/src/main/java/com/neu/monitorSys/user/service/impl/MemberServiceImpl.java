@@ -1,17 +1,21 @@
 package com.neu.monitorSys.user.service.impl;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.Member;
-import com.neu.monitorSys.entity.Permissions;
-import com.neu.monitorSys.entity.Roles;
-import com.neu.monitorSys.entity.DTO.MemberWithRole;
+import com.neu.monitorSys.common.entity.Member;
+import com.neu.monitorSys.common.entity.Permissions;
+import com.neu.monitorSys.common.entity.Roles;
+import com.neu.monitorSys.common.DTO.MemberWithRole;
+import com.neu.monitorSys.user.DTO.MemberSearchDTO;
 import com.neu.monitorSys.user.client.RoleClient;
-import com.neu.monitorSys.user.constants.UserRedisPrefix;
+import com.neu.monitorSys.common.constants.UserRedisPrefix;
 import com.neu.monitorSys.user.mapper.MemberMapper;
 import com.neu.monitorSys.user.service.IMemberService;
 import com.neu.monitorSys.user.util.RedisUtil;
@@ -21,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +114,38 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     @Override
+    public IPage<MemberWithRole> selectMembers(MemberSearchDTO memberSearchDTO, Integer page, Integer size) {
+        LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(memberSearchDTO.getLogId() != null, Member::getLogid, memberSearchDTO.getLogId())
+                .like(StrUtil.isNotBlank(memberSearchDTO.getName()), Member::getMname, memberSearchDTO.getName())
+                .eq(StrUtil.isNotBlank(memberSearchDTO.getMobile()), Member::getTel, memberSearchDTO.getMobile())
+                .eq(memberSearchDTO.getGender() != null, Member::getGender, memberSearchDTO.getGender())
+                .eq(memberSearchDTO.getState() != null, Member::getState, memberSearchDTO.getState());
+        if (memberSearchDTO.getRoles()!=null&&!memberSearchDTO.getRoles().equals("")) {
+            List<String> memberIds = roleClient.getLogIdByRoleName(memberSearchDTO.getRoles()).getData();
+            if(memberIds!=null&&memberIds.size()>0){
+                wrapper.in(Member::getLogid, memberIds);
+            }else {
+                return new Page<>();
+            }
+        }
+        IPage<Member> memberIPage = memberMapper.selectPage(new Page<>(page, size), wrapper);
+        List<Member> members = memberIPage.getRecords();
+//        List<Member> members = memberMapper.selectList(wrapper);
+        List<MemberWithRole> memberWithRoles = new ArrayList<>();
+        members.forEach(member -> {
+            MemberWithRole memberWithRole = getMemberWithRole(member.getLogid());
+            memberWithRoles.add(memberWithRole);
+        });
+        IPage<MemberWithRole> memberWithRoleIPage = new Page<>();
+        memberWithRoleIPage.setRecords(memberWithRoles);
+        memberWithRoleIPage.setTotal(memberIPage.getTotal());
+        memberWithRoleIPage.setCurrent(memberIPage.getCurrent());
+        memberWithRoleIPage.setSize(memberIPage.getSize());
+        return memberWithRoleIPage;
+    }
+
+    @Override
     public Member getMember(String logId) {
         LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Member::getLogid, logId);
@@ -138,7 +175,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     @Override
-    public Integer getRoleIdByLogId(String logId) {
+    public List<Integer> getRoleIdByLogId(String logId) {
         return memberMapper.getRoleIdByLogId(logId);
     }
 
@@ -154,6 +191,57 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if(i<=0){
             throw new RuntimeException("新增用户失败");
         }
+    }
+
+    @Override
+    public boolean isNewMember(String logId) {
+        LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Member::getLogid, logId);
+        Member member = memberMapper.selectOne(wrapper);
+        if (ObjectUtil.isNull(member)) {
+            throw new RuntimeException("用户不存在");
+        }
+        return member.getIsNew() == 1;
+    }
+
+    @Override
+    @Transactional
+    public boolean setIsNew(String logId) {
+        UpdateWrapper<Member> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("logid", logId);
+        Member member = new Member();
+        member.setIsNew(0);
+        int update = memberMapper.update(member, updateWrapper);
+        if (update <= 0) {
+            throw new RuntimeException("设置失败");
+        }
+        //删除redis缓存
+        redisUtil.del(UserRedisPrefix.USER_ROLE_PREFIX + logId);
+        return true;
+    }
+
+    @Override
+    public boolean disableMember(String logId, String currentLogId) {
+        if (logId.equals(currentLogId)) {
+            throw new RuntimeException("不能禁用自己");
+        }
+        boolean updated=memberMapper.disableSysUser(0,logId);
+        if (!updated) {
+            throw new RuntimeException("禁用失败");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean enableMember(String logId, String currentLogId) {
+        if (logId.equals(currentLogId)) {
+            throw new RuntimeException("不能启用自己");
+        }
+        boolean updated=memberMapper.disableSysUser(1,logId);
+        if (!updated) {
+            throw new RuntimeException("启用失败");
+        }
+        return true;
     }
 
 

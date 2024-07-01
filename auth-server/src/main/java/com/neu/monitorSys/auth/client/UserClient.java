@@ -1,10 +1,8 @@
 package com.neu.monitorSys.auth.client;
 
-import com.neu.monitorSys.entity.DTO.MemberWithRole;
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.Member;
-import com.neu.monitorSys.entity.constants.SecurityConstants;
-import feign.Headers;
+import com.neu.monitorSys.common.DTO.MemberWithRole;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.entity.Member;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,4 +23,9 @@ public interface UserClient {
     @GetMapping("/api/v1/members/info")
      MyResponse<MemberWithRole> getMemberInfo(@RequestHeader("logId") String logId);
 
+    @GetMapping("/api/v1/members/is-new/{logId}")
+    MyResponse<Boolean> isNewMember(@PathVariable("logId") String logId);
+
+    @PutMapping("/api/v1/members/set-is-new/{logId}")
+    MyResponse<Boolean> setIsNew(@PathVariable("logId") String logId);
 }

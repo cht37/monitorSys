@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.controller;
 
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.constants.ResultCode;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.ResultCode;
 import com.neu.monitorSys.geography.service.IDistrictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

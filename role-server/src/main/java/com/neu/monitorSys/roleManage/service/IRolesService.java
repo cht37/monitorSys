@@ -1,7 +1,7 @@
 package com.neu.monitorSys.roleManage.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.neu.monitorSys.entity.Roles;
+import com.neu.monitorSys.common.entity.Roles;
 
 
 import java.util.List;
@@ -36,5 +36,16 @@ public interface IRolesService extends IService<Roles> {
     //设置角色为默认角色（“PUBLIC”）
     void setDefaultRole(Integer userId);
 
+    //修改用户角色
+    boolean updateUserRole(String logId, List<Integer> roleIds);
 
+    /**
+     * 根据角色字符串获取用户id列表
+     */
+    List<String> getLogIdByRoleName(String roleNames);
+
+    /**
+     * 角色是否被禁用
+     */
+    boolean isRoleEnabled(Integer roleId);
 }

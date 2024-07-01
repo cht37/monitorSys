@@ -11,8 +11,8 @@
         where member.logid = #{logid}
     </select>
 
-    <select id="getRolesByMemberId" resultType="com.neu.monitorSys.entity.Roles">
-        select id, mname, enable
+    <select id="getRolesByMemberId" resultType="com.neu.monitorSys.common.entity.Roles">
+        select id, mname,nick_name, enable,remark
         from roles
         where id in (select role_id from user_role where user_id = #{memberId})
     </select>

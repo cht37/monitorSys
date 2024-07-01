@@ -2,7 +2,7 @@ package com.neu.monitorSys.geography.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.Cities;
+import com.neu.monitorSys.common.entity.Cities;
 import com.neu.monitorSys.geography.constants.GeoRedisPrefix;
 import com.neu.monitorSys.geography.mapper.CitiesMapper;
 import com.neu.monitorSys.geography.service.ICitiesService;
@@ -53,7 +53,11 @@ public class CitiesServiceImpl extends ServiceImpl<CitiesMapper, Cities> impleme
         LambdaQueryWrapper<Cities> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Cities::getCityName, cityName);
         wrapper.eq(Cities::getProvinceId, provinceId);
-        return citiesMapper.selectOne(wrapper).getCityId();
+        Cities cities = citiesMapper.selectOne(wrapper);
+        if (cities == null) {
+            return null;
+        }
+        return cities.getCityId();
 
     }
 

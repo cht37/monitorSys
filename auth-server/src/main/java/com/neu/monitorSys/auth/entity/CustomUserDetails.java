@@ -1,8 +1,8 @@
 package com.neu.monitorSys.auth.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.neu.monitorSys.entity.Permissions;
-import com.neu.monitorSys.entity.SysUser;
+import com.neu.monitorSys.common.entity.Permissions;
+import com.neu.monitorSys.common.entity.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

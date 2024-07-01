@@ -1,0 +1,18 @@
+server:
+  port: 8008
+spring:
+  application:
+    name: aqi-server
+  devtools:
+    restart:
+      enabled: true #是否支持热部署cloud:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery: #启用 spring cloud nacos discovery
+        server-addr: 192.168.244.128:8848
+      config:
+        server-addr: 192.168.244.128:8848
+  config:
+    import: nacos:database.yaml, nacos:rabbitmq.yaml, nacos:redis.yaml,nacos:seata.yaml

@@ -1,9 +1,9 @@
 package com.neu.monitorSys.roleManage.controller;
 
 
-import com.neu.monitorSys.entity.DTO.MyResponse;
-import com.neu.monitorSys.entity.constants.ResultCode;
-import com.neu.monitorSys.entity.Roles;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.ResultCode;
+import com.neu.monitorSys.common.entity.Roles;
 import com.neu.monitorSys.roleManage.service.IRolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -91,7 +91,12 @@ public class RolesController {
      */
     @GetMapping("/permissions")
     public MyResponse<List<String>> getRolesByPermissionUrl(@RequestParam String permissionUrl){
-        List<String> roles=rolesService.getRoleListByPermissionUrl(permissionUrl);
+        List<String> roles= null;
+        try {
+            roles = rolesService.getRoleListByPermissionUrl(permissionUrl);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "查询失败"+e.getMessage(),null);
+        }
         if (roles!=null&&roles.size()>0) {
             return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", roles);
         }
@@ -104,9 +109,9 @@ public class RolesController {
      * @return
      */
 
-    @GetMapping("/users/{userId}/roles")
-    public MyResponse<List<String>> getRoleNamesByUserId(@PathVariable String userId){
-        List<String> roles=rolesService.getRoleNamesByUserId(userId);
+    @GetMapping("/users/{logId}/roles")
+    public MyResponse<List<String>> getRoleNamesByUserId(@PathVariable String logId){
+        List<String> roles=rolesService.getRoleNamesByUserId(logId);
         if (roles!=null&&roles.size()>0) {
             return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", roles);
         }
@@ -128,6 +133,48 @@ public class RolesController {
             return new MyResponse<>(ResultCode.FAILED.getCode(), "设置失败",false);
         }
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "设置成功",true);
+    }
+
+
+    /**
+     * 修改用户角色
+     * @param logId 用户id
+     * @param roleIds 角色id列表
+     * @return 是否修改成功
+     */
+    @PutMapping("/users/{logId}/roles")
+    public MyResponse<Boolean> updateUserRole(@PathVariable String logId, @RequestBody List<Integer> roleIds){
+        boolean result;
+        try {
+            result= rolesService.updateUserRole(logId,roleIds);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "修改失败",false);
+        }
+        if (result) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "修改成功",true);
+        }else {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "修改失败",false);
+        }
+
+    }
+
+    /**
+     * 根据角色字符串获取用户id列表
+     * @param roleNames 角色字符串
+     * @return 用户id列表
+     */
+    @GetMapping("/users")
+    public MyResponse<List<String>> getLogIdByRoleName(@RequestParam String roleNames){
+        List<String> logIds= null;
+        try {
+            logIds = rolesService.getLogIdByRoleName(roleNames);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "查询失败"+e.getMessage(),null);
+        }
+        if (logIds!=null&&logIds.size()>0) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", logIds);
+        }
+        return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "未查询到用户",null);
     }
 }
 

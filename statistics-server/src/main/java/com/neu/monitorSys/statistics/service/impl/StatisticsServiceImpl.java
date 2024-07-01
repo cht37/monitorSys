@@ -1,25 +1,56 @@
 package com.neu.monitorSys.statistics.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateTime;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.AqiFeedback;
-import com.neu.monitorSys.entity.GridManager;
-import com.neu.monitorSys.entity.Statistics;
+import com.neu.monitorSys.common.DTO.AqiDTO;
+import com.neu.monitorSys.common.DTO.MyResponse;
+import com.neu.monitorSys.common.constants.ResultCode;
+import com.neu.monitorSys.common.entity.AqiFeedback;
+import com.neu.monitorSys.common.entity.GridManager;
+import com.neu.monitorSys.common.entity.Statistics;
+import com.neu.monitorSys.statistics.DTO.ProvinceAqiStatsDTO;
 import com.neu.monitorSys.statistics.DTO.ReportDTO;
 import com.neu.monitorSys.statistics.DTO.StatisticsQueryDTO;
 import com.neu.monitorSys.statistics.VO.StatisticsVO;
+import com.neu.monitorSys.statistics.client.AqiClient;
 import com.neu.monitorSys.statistics.client.FeedbackClient;
 import com.neu.monitorSys.statistics.client.GeoClient;
 import com.neu.monitorSys.statistics.client.UserClient;
+import com.neu.monitorSys.statistics.entity.StatisticsES;
 import com.neu.monitorSys.statistics.mapper.StatisticsMapper;
+import com.neu.monitorSys.statistics.publisher.StatisticsPublisher;
+import com.neu.monitorSys.statistics.repository.EsStatisticsRepository;
 import com.neu.monitorSys.statistics.service.IStatisticsService;
 import io.seata.spring.annotation.GlobalTransactional;
+
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.Avg;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+
+import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -42,6 +73,21 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
     private GeoClient geoClient;
     @Autowired
     private UserClient userClient;
+    @Autowired
+    private AqiClient aqiClient;
+
+    @Autowired
+    private StatisticsPublisher statisticsPublisher;
+
+     @Autowired
+    private EsStatisticsRepository repository;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+
+     @Autowired
+    private RestHighLevelClient client;
 
     /**
      * 统计分析数据（可能是异步任务）
@@ -51,17 +97,34 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
 
     }
 
+    /**
+     * 网格员上报数据
+     *
+     * @param reportDTO 上报数据
+     * @param logId     网格员id
+     */
     @Override
     @GlobalTransactional
     public void gridManagerReport(ReportDTO reportDTO, String logId) {
+        //通过logId获取afId
+        MyResponse<Integer> response = userClient.getAfIdByLogId(logId);
+        Integer afId = response.getData();
+        if (afId == null) {
+            throw new RuntimeException("网格员未指派");
+        }
+        reportDTO.setAfId(afId);
         //1.通过afUId获取feedback记录中的地址以及详情
         Object data = feedbackClient.findFeedbackById(reportDTO.getAfId()).getData();
         AqiFeedback feedback = BeanUtil.toBean(data, AqiFeedback.class);
         //2.判断feedback状态，如果是已处理，则抛出异常
-        if (feedback.getState() == 2) {
+        if (feedback.getState() == 3) {
             throw new RuntimeException("该反馈已处理");
         } else if (feedback.getState() == 0) {
             throw new RuntimeException("该反馈未指派");
+        }
+        //3.属性不为空判断
+        if (reportDTO.getSo2Value() == null || reportDTO.getCoValue() == null || reportDTO.getSpmValue() == null) {
+            throw new RuntimeException("数据不完整");
         }
         //4.复制属性到statistics
         Statistics statistics = new Statistics();
@@ -70,7 +133,10 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
         statistics.setDistrictId(feedback.getDistrictId());
         statistics.setAddress(feedback.getAddress());
         statistics.setFdTel(feedback.getTelId());
+        statistics.setGmId(logId);
         statistics.setInformation(feedback.getInformation());
+        //设置确认时间
+        statistics.setConfirmDatetime(DateTime.now().toLocalDateTime());
         BeanUtil.copyProperties(reportDTO, statistics);
         //判断是否存在afId 相同的记录
         LambdaQueryWrapper<Statistics> wrapper = new LambdaQueryWrapper<>();
@@ -82,7 +148,7 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
         //5.写入入statistics
         statisticsMapper.insert(statistics);
         //6.修改feedback状态，为已确认
-        feedbackClient.updateFeedbackState(reportDTO.getAfId(), 2);
+        feedbackClient.updateFeedbackState(reportDTO.getAfId(), 3);
         //7.修改网格员状态
         GridManager gridManager = new GridManager();
         gridManager.setAfId(null);
@@ -90,9 +156,29 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
         gridManager.setAreaId(null);
         //设置状态为可工作状态
         gridManager.setState(0);
-        //TODO 8.发布异步消息，计算aqi
+        int code = userClient.editGridMember(gridManager).getStatusCode();
+        if (code != ResultCode.SUCCESS.getCode()) {
+            throw new RuntimeException("网格员状态修改失败");
+        }
+        boolean send = false;
+        try {
+            send = statisticsPublisher.sendStaticsData(reportDTO);
+        } catch (Exception e) {
+            throw new RuntimeException("消息发送失败");
+        }
+        if (!send) {
+            throw new RuntimeException("消息发送失败");
+        }
     }
 
+    /**
+     * 分条件查询统计数据
+     *
+     * @param statisticsQueryDTO 查询条件
+     * @param page               页数
+     * @param size               每页大小
+     * @return 查询结果
+     */
     @Override
     public IPage<StatisticsVO> queryStatisticsData(StatisticsQueryDTO statisticsQueryDTO, int page, int size) {
         //如果id不为空，则直接查询
@@ -111,24 +197,33 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
         LambdaQueryWrapper<Statistics> wrapper = new LambdaQueryWrapper<>();
         //如果省市区名称不为空
         if (statisticsQueryDTO.getProvinceName() != null || statisticsQueryDTO.getCityName() != null || statisticsQueryDTO.getDistrictName() != null) {
-            //获取省份编号
-            String provinceId = (String) geoClient.getProvinceId(statisticsQueryDTO.getProvinceName()).getData();
-            if (provinceId == null || provinceId.equals("")) {
-                return null;
+            String provinceId = null;
+            if (statisticsQueryDTO.getProvinceName() != null) {
+                //获取省份编号
+                provinceId = (String) geoClient.getProvinceId(statisticsQueryDTO.getProvinceName()).getData();
+                if (provinceId == null || provinceId.equals("")) {
+                    return new Page<>();
+                }
+                wrapper.eq(Statistics::getProvinceId, provinceId);
             }
-            //获取城市编号
-            String cityId = (String) geoClient.getCityIdByProvinceId(statisticsQueryDTO.getCityName(), provinceId).getData();
-            if (cityId == null || cityId.equals("")) {
-                return null;
+            String cityId = null;
+            if (statisticsQueryDTO.getCityName() != null && provinceId != null) {
+                //获取城市编号
+                cityId = (String) geoClient.getCityIdByProvinceId(statisticsQueryDTO.getCityName(), provinceId).getData();
+                if (cityId == null || cityId.equals("")) {
+                    return new Page<>();
+                }
+                wrapper.eq(Statistics::getCityId, cityId);
             }
-            //获取区域编号
-            String districtId = (String) geoClient.getDistrictId(statisticsQueryDTO.getDistrictName(), cityId).getData();
-            if (districtId == null || districtId.equals("")) {
-                return null;
+            String districtId = null;
+            if (statisticsQueryDTO.getDistrictName() != null && cityId != null) {
+                //获取区域编号
+                districtId = (String) geoClient.getDistrictId(statisticsQueryDTO.getDistrictName(), cityId).getData();
+                if (districtId != null && !districtId.equals("")) {
+                    return new Page<>();
+                }
+                wrapper.eq(Statistics::getDistrictId, districtId);
             }
-            wrapper.eq(Statistics::getCityId, cityId);
-            wrapper.eq(Statistics::getProvinceId, provinceId);
-            wrapper.eq(Statistics::getDistrictId, districtId);
         }
         //如果so2上下限不为空
         if (statisticsQueryDTO.getSo2ValueMax() != null || statisticsQueryDTO.getSo2ValueMin() != null) {
@@ -227,13 +322,24 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
                 wrapper.orderByDesc(Statistics::getAqi);
             }
         }
+        //重新收集数据
         return recollect(page, size, wrapper);
     }
 
+    @Override
+    public IPage<StatisticsVO> queryStatisticsDataById(String logId, int page, int size) {
+        LambdaQueryWrapper<Statistics> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Statistics::getGmId, logId);
+        wrapper.orderByAsc(Statistics::getConfirmDatetime);
+        return recollect(page, size, wrapper);
+    }
+
+
     /**
      * 重新收集数据
-     * @param page 页数
-     * @param size 每页大小
+     *
+     * @param page    页数
+     * @param size    每页大小
      * @param wrapper 查询条件
      * @return 查询结果
      */
@@ -290,12 +396,235 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
                                     statisticsVO.setGmName((String) name);
                                     return statisticsVO;
                                 }
+                        ).thenCombine(
+                                //如果So2Aqi不为空，则查询So2级别
+                                CompletableFuture.supplyAsync(() -> {
+                                    if (statistic.getSo2Aqi() != null) {
+                                        return aqiClient.getAqiLevel(statistic.getSo2Aqi()).getData();
+                                    }
+                                    return null;
+                                }), (statisticsVO, aqiDTO) -> {
+                                    statisticsVO.setS02Level(BeanUtil.toBean(aqiDTO, AqiDTO.class));
+                                    return statisticsVO;
+                                }
+                        ).thenCombine(
+                                //如果CoAqi不为空，则查询Co级别
+                                CompletableFuture.supplyAsync(() -> {
+                                    if (statistic.getCoValue() != null) {
+                                        return aqiClient.getAqiLevel(statistic.getAqi()).getData();
+                                    }
+                                    return null;
+                                }), (statisticsVO, aqiDTO) -> {
+                                    statisticsVO.setCoLevel(BeanUtil.toBean(aqiDTO, AqiDTO.class));
+                                    return statisticsVO;
+                                }
+                        ).thenCombine(
+                                //如果SpmAqi不为空，则查询Spm级别
+                                CompletableFuture.supplyAsync(() -> {
+                                    if (statistic.getSpmValue() != null) {
+                                        return aqiClient.getAqiLevel(statistic.getSo2Aqi()).getData();
+                                    }
+                                    return null;
+                                }), (statisticsVO, aqiDTO) -> {
+                                    statisticsVO.setSpmLevel(BeanUtil.toBean(aqiDTO, AqiDTO.class));
+                                    return statisticsVO;
+                                }
+                        ).thenCombine(
+                                //如果Aqi不为空，则查询Aqi级别
+                                CompletableFuture.supplyAsync(() -> {
+                                    if (statistic.getAqi() != null) {
+                                        return aqiClient.getAqiLevel(statistic.getAqi()).getData();
+                                    }
+                                    return null;
+                                }), (statisticsVO, aqiDTO) -> {
+                                    statisticsVO.setAqiLevel(BeanUtil.toBean(aqiDTO, AqiDTO.class));
+                                    return statisticsVO;
+                                }
                         )
-                        //todo 结合aqi级别数据
                 ).toList();
         return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
 
     }
 
+
+    @Override
+    public SearchPage<StatisticsES> queryStatisticsDataES(StatisticsQueryDTO statisticsQueryDTO, int page, int size) {
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        // 添加查询条件
+        if (statisticsQueryDTO.getId() != null) {
+            boolQuery.must(QueryBuilders.termQuery("id", statisticsQueryDTO.getId()));
+        }
+        if (statisticsQueryDTO.getAfId() != null) {
+            boolQuery.must(QueryBuilders.termQuery("af_id", statisticsQueryDTO.getAfId()));
+        }
+        //如果省市区名称有一个不为空，则添加查询条件，需要首先查询省份编号
+        String provinceId=null, cityId = null, districtId=null;
+        if (statisticsQueryDTO.getProvinceName() != null||statisticsQueryDTO.getCityName() != null||statisticsQueryDTO.getDistrictName() != null) {
+            if (statisticsQueryDTO.getProvinceName() == null) {
+                throw new RuntimeException("省份名称不能为空");
+            }
+            provinceId = (String) geoClient.getProvinceId(statisticsQueryDTO.getProvinceName()).getData();
+            if (provinceId == null || provinceId.equals("")) {
+                throw new RuntimeException("省份名称错误");
+            }
+            if (statisticsQueryDTO.getCityName() != null) {
+                cityId = (String) geoClient.getCityIdByProvinceId(statisticsQueryDTO.getCityName(), provinceId).getData();
+                if (cityId == null || cityId.equals("")) {
+                    throw new RuntimeException("城市名称错误");
+                }
+            }
+            if (statisticsQueryDTO.getDistrictName() != null) {
+                districtId = (String) geoClient.getDistrictId(statisticsQueryDTO.getDistrictName(), cityId).getData();
+                if (districtId == null || districtId.equals("")) {
+                    throw new RuntimeException("区域名称错误");
+                }
+            }
+
+        }
+
+        if (provinceId!=null) {
+            boolQuery.must(QueryBuilders.termQuery("province_id.keyword", provinceId));
+        }
+        if (cityId!=null) {
+            boolQuery.must(QueryBuilders.termQuery("city_id.keyword", cityId));
+        }
+        if (districtId != null) {
+            boolQuery.must(QueryBuilders.termQuery("district_id.keyword",districtId));
+        }
+        if (statisticsQueryDTO.getAddress() != null) {
+            boolQuery.must(QueryBuilders.termQuery("address.keyword", statisticsQueryDTO.getAddress()));
+        }
+        if (statisticsQueryDTO.getSo2ValueMax() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("so2_value").lte(statisticsQueryDTO.getSo2ValueMax()));
+        }
+        if (statisticsQueryDTO.getSo2ValueMin() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("so2_value").gte(statisticsQueryDTO.getSo2ValueMin()));
+        }
+        if (statisticsQueryDTO.getCoValueMax() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("co_value").lte(statisticsQueryDTO.getCoValueMax()));
+        }
+        if (statisticsQueryDTO.getCoValueMin() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("co_value").gte(statisticsQueryDTO.getCoValueMin()));
+        }
+        if (statisticsQueryDTO.getSpmValueMax() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("spm_value").lte(statisticsQueryDTO.getSpmValueMax()));
+        }
+        if (statisticsQueryDTO.getSpmValueMin() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("spm_value").gte(statisticsQueryDTO.getSpmValueMin()));
+        }
+        if (statisticsQueryDTO.getAqiMax() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("aqi").lte(statisticsQueryDTO.getAqiMax()));
+        }
+        if (statisticsQueryDTO.getAqiMin() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("aqi").gte(statisticsQueryDTO.getAqiMin()));
+        }
+        if (statisticsQueryDTO.getConfirmDatetime() != null) {
+            boolQuery.must(QueryBuilders.termQuery("confirm_datetime", statisticsQueryDTO.getConfirmDatetime()));
+        }
+        if (statisticsQueryDTO.getGmId() != null) {
+            boolQuery.must(QueryBuilders.termQuery("gm_id.keyword", statisticsQueryDTO.getGmId()));
+        }
+        if (statisticsQueryDTO.getFdTel() != null) {
+            boolQuery.must(QueryBuilders.termQuery("fd_tel.keyword", statisticsQueryDTO.getFdTel()));
+        }
+
+        // 构建查询
+        NativeSearchQueryBuilder searchQueryBuilder = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .withPageable(PageRequest.of(page, size));
+
+        // 添加排序条件
+        if (statisticsQueryDTO.getSo2Ascending() != null) {
+            searchQueryBuilder.withSort(SortBuilders.fieldSort("so2_value")
+                    .order(statisticsQueryDTO.getSo2Ascending() ? SortOrder.ASC : SortOrder.DESC));
+        }
+        if (statisticsQueryDTO.getCoAscending() != null) {
+            searchQueryBuilder.withSort(SortBuilders.fieldSort("co_value")
+                    .order(statisticsQueryDTO.getCoAscending() ? SortOrder.ASC : SortOrder.DESC));
+        }
+        if (statisticsQueryDTO.getSpmAscending() != null) {
+            searchQueryBuilder.withSort(SortBuilders.fieldSort("spm_value")
+                    .order(statisticsQueryDTO.getSpmAscending() ? SortOrder.ASC : SortOrder.DESC));
+        }
+        if (statisticsQueryDTO.getAqiAscending() != null) {
+            searchQueryBuilder.withSort(SortBuilders.fieldSort("aqi")
+                    .order(statisticsQueryDTO.getAqiAscending() ? SortOrder.ASC : SortOrder.DESC));
+        }
+
+        // 执行查询
+        if (boolQuery.hasClauses()) {
+            NativeSearchQuery searchQuery = searchQueryBuilder.build();
+            SearchHits<StatisticsES> searchHits = elasticsearchRestTemplate.search(searchQuery, StatisticsES.class);
+            return SearchHitSupport.searchPageFor(searchHits, PageRequest.of(page, size));
+        } else {
+            SearchPage<StatisticsES> searchPage = queryAllStatisticsData(page, size);
+            return searchPage;
+        }
+    }
+     public SearchPage<StatisticsES> queryAllStatisticsData(int page, int size) {
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.matchAllQuery())
+                .withPageable(PageRequest.of(page, size))
+                .build();
+
+        SearchHits<StatisticsES> searchHits = elasticsearchRestTemplate.search(searchQuery, StatisticsES.class);
+        return SearchHitSupport.searchPageFor(searchHits, PageRequest.of(page, size));
+    }
+
+    public List<SearchHit<StatisticsES>> queryAllStatisticsData() {
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.matchAllQuery())
+                .build();
+
+        SearchHits<StatisticsES> searchHits = elasticsearchRestTemplate.search(searchQuery, StatisticsES.class);
+        searchHits.forEach(searchHit -> {
+            System.out.println(searchHit.getContent());
+        });
+        return searchHits.getSearchHits();
+    }
+
+    /**
+     * 获取省级空气质量统计信息
+     * @return 省级空气质量统计信息
+     * @throws IOException IO异常
+     */
+    @Override
+   public List<ProvinceAqiStatsDTO> getProvinceAqiStatistics() throws IOException {
+            SearchRequest searchRequest = new SearchRequest("statistics_es");
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+            searchSourceBuilder.aggregation(AggregationBuilders.terms("by_province")
+                    .field("province_id.keyword")
+                    .subAggregation(AggregationBuilders.avg("avg_so2_value").field("so2_value"))
+                    .subAggregation(AggregationBuilders.avg("avg_co_value").field("co_value"))
+                    .subAggregation(AggregationBuilders.avg("avg_spm_value").field("spm_value"))
+                    .subAggregation(AggregationBuilders.avg("avg_aqi").field("aqi"))
+            );
+            searchSourceBuilder.size(0); // We don't need the actual documents, just the aggregation results
+            searchRequest.source(searchSourceBuilder);
+
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+            Aggregations aggregations = searchResponse.getAggregations();
+            Terms byProvince = aggregations.get("by_province");
+
+        List<ProvinceAqiStatsDTO> stats = new ArrayList<>();
+        for (Terms.Bucket bucket : byProvince.getBuckets()) {
+            ProvinceAqiStatsDTO dto = new ProvinceAqiStatsDTO();
+            dto.setProvinceId(bucket.getKeyAsString());
+            Avg avgSo2Value = bucket.getAggregations().get("avg_so2_value");
+            Avg avgCoValue = bucket.getAggregations().get("avg_co_value");
+            Avg avgSpmValue = bucket.getAggregations().get("avg_spm_value");
+            Avg avgAqi = bucket.getAggregations().get("avg_aqi");
+            dto.setAvgSo2Value(avgSo2Value.getValue());
+            dto.setAvgCoValue(avgCoValue.getValue());
+            dto.setAvgSpmValue(avgSpmValue.getValue());
+            dto.setAvgAqi(avgAqi.getValue());
+            stats.add(dto);
+        }
+
+        return stats;
+    }
 
 }

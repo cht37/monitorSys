@@ -1,7 +1,7 @@
 package com.neu.monitorSys.geography.mapper;
 
 import com.neu.monitorSys.geography.DTO.GeographyVO;
-import com.neu.monitorSys.entity.GridManagerArea;
+import com.neu.monitorSys.common.entity.GridManagerArea;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

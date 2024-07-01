@@ -9,15 +9,16 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.neu.monitorSys.entity.AqiFeedback;
-import com.neu.monitorSys.entity.GridManager;
-import com.neu.monitorSys.entity.Member;
+import com.neu.monitorSys.common.entity.AqiFeedback;
+import com.neu.monitorSys.common.entity.GridManager;
+import com.neu.monitorSys.common.entity.Member;
 import com.neu.monitorSys.user.DTO.AssignDTO;
 import com.neu.monitorSys.user.DTO.GeographyDTO;
+import com.neu.monitorSys.user.DTO.GridManagerDTO;
 import com.neu.monitorSys.user.DTO.GridManagerFullVO;
 import com.neu.monitorSys.user.client.FeedbackClient;
 import com.neu.monitorSys.user.client.GeoClient;
-import com.neu.monitorSys.user.constants.UserRedisPrefix;
+import com.neu.monitorSys.common.constants.UserRedisPrefix;
 import com.neu.monitorSys.user.mapper.GridManagerMapper;
 import com.neu.monitorSys.user.mapper.MemberMapper;
 import com.neu.monitorSys.user.service.IGridManagerService;
@@ -48,7 +49,7 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
     private MemberMapper memberMapper;
     @Autowired
     private GeoClient geoClient;
-//    @Autowired
+    //    @Autowired
 //    private RoleClient roleClient;
     @Autowired
     private FeedbackClient feedbackClient;
@@ -63,7 +64,9 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         if (gridManagerStr != null) {
             return JSONUtil.toBean(gridManagerStr, GridManager.class);
         }
-        GridManager gridManager = lambdaQuery().eq(GridManager::getMemberId, logId).one();
+        LambdaQueryWrapper<GridManager> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(GridManager::getMemberId, logId);
+        GridManager gridManager = gridManagerMapper.selectOne(queryWrapper);
         if (!ObjectUtil.isEmpty(gridManager)) {
             //去除网格员id
             gridManager.setGmId(null);
@@ -73,11 +76,12 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         }
         return null;
     }
+    //todo 有问题
 
     /**
      * 多条件查询网格员信息
      */
-    public IPage<GridManagerFullVO> findGridManagersByConditions(GridManagerFullVO gridManagerFullVO, int page, int size) {
+    public IPage<GridManagerFullVO> findGridManagersByConditions(GridManagerDTO gridManagerDTO, int page, int size) {
         //redis实现分页+多条件查询
         /*
           首先我们可以采用多条件模糊查询章节所说的方式，将我们所涉及到的条件字段作为hash的field，
@@ -89,16 +93,19 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
           如果已经存在了，则直接对这个ZSet进行分页查询即可。对ZSet进行分页的方式已经在前面叙述过了。通过这样的方式我们就实现了最简单的分页+多条件模糊查询。
          */
         //TODO 考虑使用es实现分页+多条件查询
+        //模糊查询地址Id
+          Integer areaId=null;
+        if (gridManagerDTO.getAddress() != null&&!gridManagerDTO.getAddress().equals("")) {
+           areaId = geoClient.getGridIdByGridNameLike(gridManagerDTO.getAddress()).getData();
+        }
         //多条件查询
         LambdaQueryWrapper<GridManager> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(GridManager::getMemberId, GridManager::getAreaId, GridManager::getState, GridManager::getRemark);
-        if (gridManagerFullVO.getMember() != null) {
-            queryWrapper.like(GridManager::getMemberId, gridManagerFullVO.getMember().getLogid());
-        }
-        queryWrapper.eq(gridManagerFullVO.getAreaId() != null, GridManager::getAreaId, gridManagerFullVO.getAreaId());
-        queryWrapper.eq(gridManagerFullVO.getRoleState() != null, GridManager::getState, gridManagerFullVO.getRoleState());
-        queryWrapper.eq(gridManagerFullVO.getAfId() != null, GridManager::getAfId, gridManagerFullVO.getAfId());
-        queryWrapper.eq(gridManagerFullVO.getRemark() != null, GridManager::getRemark, gridManagerFullVO.getRemark());
+        queryWrapper.select(GridManager::getMemberId, GridManager::getAreaId, GridManager::getAfId, GridManager::getState, GridManager::getRemark);
+        queryWrapper.eq(gridManagerDTO.getLogId() != null&&!gridManagerDTO.getLogId().equals(""), GridManager::getMemberId, gridManagerDTO.getLogId());
+        queryWrapper.eq(gridManagerDTO.getAddress() != null&&!gridManagerDTO.getAddress().equals(""), GridManager::getAreaId, areaId);
+        queryWrapper.eq(gridManagerDTO.getRoleState() != null, GridManager::getState, gridManagerDTO.getRoleState());
+        queryWrapper.eq(gridManagerDTO.getAfId() != null, GridManager::getAfId, gridManagerDTO.getAfId());
+
         // 创建分页对象
         Page<GridManager> gridManagerPage = new Page<>(page, size);
 
@@ -108,29 +115,30 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         // 构建返回结果
         IPage<GridManagerFullVO> resultPage = new Page<>(page, size, gridManagerIPage.getTotal());
         List<GridManagerFullVO> gridManagerFullVOList = gridManagerIPage.getRecords().stream().map(gridManager -> {
-            GridManagerFullVO dto = new GridManagerFullVO();
-            dto.setAreaId(gridManager.getAreaId());
-            dto.setRoleState(gridManager.getState());
-            dto.setRemark(gridManager.getRemark());
+            GridManagerFullVO vo = new GridManagerFullVO();
+            vo.setAreaId(gridManager.getAreaId());
+            vo.setRoleState(gridManager.getState());
+            vo.setRemark(gridManager.getRemark());
             Member member = memberMapper.selectOne(new LambdaQueryWrapper<Member>().eq(Member::getLogid, gridManager.getMemberId()));
             member.setId(null);
             //向角色服务获取网格员的角色信息
-            dto.setMember(member);
+            vo.setMember(member);
             //向地理服务获取网格员的地理信息
             if (gridManager.getState() == 0 || gridManager.getAreaId() == null) {
-                return dto;
+                return vo;
             }
             Object data = geoClient.getGeoInfo(gridManager.getAreaId()).getData();
             GeographyDTO bean = BeanUtil.toBean(data, GeographyDTO.class);
-            dto.setAreaName(bean.getAreaName());
-            dto.setDistrictName(bean.getDistrictName());
-            dto.setCityName(bean.getCityName());
-            dto.setProvinceName(bean.getProvinceName());
+            vo.setAreaName(bean.getAreaName());
+            vo.setAfId(gridManager.getAfId());
+            vo.setDistrictName(bean.getDistrictName());
+            vo.setCityName(bean.getCityName());
+            vo.setProvinceName(bean.getProvinceName());
 
             //TODO 封装角色信息
 //            Object roleData = roleClient.getRoleById(member.getRoleid()).getData();
 //            dto.setMemberWithRole(new MemberWithRole(member, BeanUtil.toBean(roleData, Roles.class)));
-            return dto;
+            return vo;
         }).toList();
 
         resultPage.setRecords(gridManagerFullVOList);
@@ -158,6 +166,9 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         if (gridManager.getAreaId() == null) {
             gridManagerQueryWrapper.set("area_id", null);
         }
+        if(gridManager.getAfId()==null){
+            gridManagerQueryWrapper.set("af_id",null);
+        }
         boolean result = update(gridManager, gridManagerQueryWrapper);
         if (result) {
             // 删除redis中的网格员信息
@@ -177,8 +188,11 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
     public boolean isAssign(String logId, Integer afId) {
         GridManager gridManager = getGridManagerByLogId(logId);
         //网格员状态不为2或3时（休假或其他状态），可以指派
-        if (gridManager.getState() == null || gridManager.getState() == 2 || gridManager.getState() == 3) {
+        if (gridManager.getState() == null  || gridManager.getState() == 3) {
             throw new RuntimeException("网格员正在休假或其他状态，不可指派任务");
+        }
+        if (gridManager.getState() == 2) {
+            throw new RuntimeException("网格员正在处理任务，不可指派任务");
         }
         if (Objects.equals(gridManager.getAfId(), afId)) {
             throw new RuntimeException("该反馈已指派给您");
@@ -190,7 +204,7 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
      * 网格员接受对某网格的指派
      *
      * @param assignDTO 网格员接受指派信息
-     * @param logId    网格员id
+     * @param logId     网格员id
      * @return 是否接受成功
      */
     @Override
@@ -198,7 +212,7 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
     public boolean acceptAssign(AssignDTO assignDTO, String logId) {
         //首先判断网格员是否可指派
         try {
-            isAssign(logId,assignDTO.getAfId());
+            isAssign(logId, assignDTO.getAfId());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -217,6 +231,9 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
             throw new RuntimeException("反馈信息异常，请联系管理员");
         }
         if (feedback.getState() == 2) {
+            throw new RuntimeException("该反馈正在处理中，请勿重复提交处理申请");
+        }
+        if (feedback.getState() == 3) {
             throw new RuntimeException("该反馈已处理，请勿提交处理申请");
         }
         Integer gridId = (Integer) geoClient.getGridIdByGridName(feedback.getAddress()).getData();
@@ -232,6 +249,47 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         gridManager.setState(1);
         // 通过AopContext.currentProxy()获取代理对象，调用updateGridManager方法，解决事务失效问题
         GridManagerServiceImpl gridManagerService = (GridManagerServiceImpl) AopContext.currentProxy();
-        return gridManagerService.updateGridManager(gridManager);
+        boolean updated = gridManagerService.updateGridManager(gridManager);
+        if (updated) {
+            //更新反馈信息状态
+            feedbackClient.updateFeedbackState(feedback.getAfId(), 2);
+        }
+        return updated;
+    }
+
+    @Override
+    public boolean isProcessing(String logId) {
+        GridManager gridManager = getGridManagerByLogId(logId);
+        if (gridManager == null) {
+            throw new RuntimeException("网格员不存在");
+        }
+        if (gridManager.getState()==2){
+            throw new RuntimeException("网格员正在休假");
+        }
+        return gridManager.getState() == 0;
+    }
+
+    @Override
+    public Integer getAfIdByLogId(String logId) {
+        GridManager gridManager = getGridManagerByLogId(logId);
+        if (gridManager == null) {
+            throw new RuntimeException("网格员不存在");
+        }
+        return gridManager.getAfId();
+    }
+
+    @Override
+    @Transactional
+    public boolean updateState(String logId, Integer state) {
+        if (state == null) {
+            throw new RuntimeException("状态不能为空");
+        }
+        if (state==1){
+            throw new RuntimeException("工作状态无法修改状态");
+        }
+        UpdateWrapper<GridManager> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("member_id", logId);
+        updateWrapper.set("state", state);
+        return update(updateWrapper);
     }
 }

@@ -29,6 +29,17 @@ public class NotificationController {
     }
 
     /**
+     * 创建反馈sse连接
+     * @param userId 用户Id
+     * @return SseEmitter
+     */
+    @GetMapping(path = "/feedback/connect")
+    public SseEmitter createFeedbackSseEmitter(@RequestParam String userId) {
+        String clientId = "feedback:"+userId;
+        return notificationService.createSseEmitter(clientId);
+    }
+
+    /**
      * 关闭连接
      * @param logId 用户Id
      */

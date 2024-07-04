@@ -33,4 +33,6 @@ public interface RolesMapper extends BaseMapper<Roles> {
     List<String> getLogIdByRoleNames(@Param("roleNameList") List<String> roleNameList);
 
     List<String> getLogIdByRoleName(String roleName);
+
+    List<String> getRoleNameByPermissionId(@Param("clue") List<Integer> clue);
 }

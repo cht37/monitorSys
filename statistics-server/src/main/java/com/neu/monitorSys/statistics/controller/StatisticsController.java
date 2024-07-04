@@ -4,11 +4,13 @@ package com.neu.monitorSys.statistics.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.neu.monitorSys.common.DTO.MyResponse;
 import com.neu.monitorSys.common.constants.ResultCode;
+import com.neu.monitorSys.statistics.DTO.PollutionStatisticsDTO;
 import com.neu.monitorSys.statistics.DTO.ProvinceAqiStatsDTO;
 import com.neu.monitorSys.statistics.DTO.ReportDTO;
 import com.neu.monitorSys.statistics.DTO.StatisticsQueryDTO;
 import com.neu.monitorSys.statistics.VO.StatisticsVO;
-import com.neu.monitorSys.statistics.entity.StatisticsES;
+import com.neu.monitorSys.statistics.entity.AqiStatisticsPercent;
+import com.neu.monitorSys.common.entity.StatisticsES;
 import com.neu.monitorSys.statistics.service.IStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -102,11 +104,11 @@ public class StatisticsController {
      * @return 统计数据（分页）
      */
     @GetMapping("/es/search")
-    public MyResponse<SearchPage<StatisticsES>> searchStatisticsES(
+    public MyResponse<IPage<StatisticsVO>> searchStatisticsES(
             @ModelAttribute StatisticsQueryDTO statisticsQueryDTO,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        SearchPage<StatisticsES> searchPage= null;
+        IPage<StatisticsVO> searchPage= null;
         try {
             searchPage = statisticsService.queryStatisticsDataES(statisticsQueryDTO, page, size);
         } catch (Exception e) {
@@ -148,6 +150,39 @@ public class StatisticsController {
             return new MyResponse<>(ResultCode.FAILED.getCode(), e.getMessage(), null);
         }
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", provinceAqiStatsDTO);
+    }
+
+    /**
+     * 获取各级别空气质量所占比例
+     * @return 各级别空气质量所占比例
+     */
+    @GetMapping("/aqi/percent")
+    public MyResponse<List<AqiStatisticsPercent>> getAqiLevelPercent() {
+        List<AqiStatisticsPercent> aqiStatisticsPercent = null;
+        try {
+            aqiStatisticsPercent = statisticsService.getAqiLevelPercent();
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), e.getMessage(), null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", aqiStatisticsPercent);
+    }
+
+
+    /**
+     * 根据省份聚合，获取三种污染物超标次数
+     * 超标：指的是污染等级大于等于4级
+     * @param level 污染等级
+     * @return 污染物超标次数
+     */
+    @GetMapping("/pollution")
+    public MyResponse<List<PollutionStatisticsDTO>> getProvincePollutionStats(@RequestParam Integer level) {
+        List<PollutionStatisticsDTO> pollutionStatisticsDTO = null;
+        try {
+            pollutionStatisticsDTO = statisticsService.getProvincePollutionStats(level);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), e.getMessage(), null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", pollutionStatisticsDTO);
     }
 }
 

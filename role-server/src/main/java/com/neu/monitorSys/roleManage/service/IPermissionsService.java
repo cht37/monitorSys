@@ -15,10 +15,10 @@ import java.util.List;
  */
 public interface IPermissionsService extends IService<Permissions> {
     /**
-     * 按照三级结构获取权限
-     * @return
+     * 不分层级获取权限列表
+     * @return 权限列表
      */
-    List<List<List<Permissions>>> getPermissionsByLevel();
+    List<Permissions> getAllPermissions();
     /**
      * 根据roleId获取权限列表
      */
@@ -38,11 +38,19 @@ public interface IPermissionsService extends IService<Permissions> {
     List<Permissions> getPermissionsTree();
 
     /**
-     * 新增权限
+     * 修改角色权限
      * @param roleId 角色id
      * @param permissionsId 权限id
      * @return  是否成功
      */
-    boolean addPermissions(Integer roleId,Integer[] permissionsId);
+    boolean updatePermissions(Integer roleId, Integer[] permissionsId);
+
+//    /**
+//     * 获取角色权限列表（树）
+//     * @param roleId 角色id
+//     * @return 权限列表
+//     */
+//    List<Permissions> getPermissionsTreeByRoleId(Integer roleId);
+
 
 }

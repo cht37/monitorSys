@@ -46,6 +46,9 @@ public class MyAccessManager implements AuthorizationManager<RequestAuthorizatio
     public boolean checkAuthority(Authentication authentication, List<String> roles) throws AccessDeniedException, InsufficientAuthenticationException {
         // 遍历用户拥有的权限，与当前请求的 URL 进行匹配
         for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if(authority.getAuthority().equals("ROLE_ADMIN")){
+                return true;
+            }
             log.info("#MyAccessManager#authority.getAuthority()" + authority.getAuthority());
             if (roles.contains(authority.getAuthority())) {
                 return true;
@@ -80,7 +83,7 @@ public class MyAccessManager implements AuthorizationManager<RequestAuthorizatio
         }
 
         if(originURI==null){
-            return new AuthorizationDecision(true);
+            return new AuthorizationDecision(false);
         }
 
         //远程调用查看需要的权限

@@ -1,14 +1,15 @@
 package com.neu.monitorSys.statistics.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.neu.monitorSys.common.entity.Statistics;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.neu.monitorSys.statistics.DTO.PollutionStatisticsDTO;
 import com.neu.monitorSys.statistics.DTO.ProvinceAqiStatsDTO;
 import com.neu.monitorSys.statistics.DTO.ReportDTO;
 import com.neu.monitorSys.statistics.DTO.StatisticsQueryDTO;
 import com.neu.monitorSys.statistics.VO.StatisticsVO;
-import com.neu.monitorSys.statistics.entity.StatisticsES;
+import com.neu.monitorSys.statistics.entity.AqiStatisticsPercent;
+import com.neu.monitorSys.common.entity.StatisticsES;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchPage;
 
@@ -36,7 +37,7 @@ public interface IStatisticsService extends IService<Statistics> {
 
 
         //多条件查询统计数据ES
-        SearchPage<StatisticsES> queryStatisticsDataES(StatisticsQueryDTO statisticsQueryDTO, int page, int size);
+         IPage<StatisticsVO> queryStatisticsDataES(StatisticsQueryDTO statisticsQueryDTO, int page, int size);
 
         SearchPage<StatisticsES> queryAllStatisticsData(int page, int size);
 
@@ -44,8 +45,20 @@ public interface IStatisticsService extends IService<Statistics> {
         List<SearchHit<StatisticsES>> queryAllStatisticsData();
 
         /**
-         * 获取省级空气质量统计信息
+         * 获取最近一周省级空气质量统计信息
          * @return 省级空气质量统计信息
          */
         List<ProvinceAqiStatsDTO> getProvinceAqiStatistics() throws IOException;
+
+        /**
+         * 获取各级别空气质量所占比例
+         */
+        List<AqiStatisticsPercent> getAqiLevelPercent() throws IOException;
+
+
+        /**
+         * 根据省份聚合，获取三种污染物超标次数
+         * 超标：指的是污染等级大于等于4级
+         */
+        List<PollutionStatisticsDTO> getProvincePollutionStats(Integer level) throws IOException;
 }

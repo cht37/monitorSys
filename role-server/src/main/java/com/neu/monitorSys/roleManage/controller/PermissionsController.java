@@ -75,25 +75,42 @@ public class PermissionsController {
     }
 
     /**
-     * 新增角色权限
+     * 修改角色权限
      * @param roleId 用户id
      * @param permissionsId 权限id数组
      * @return 是否新增成功
      */
-    @PostMapping("/{roleId}/add")
-    public MyResponse<Boolean> addPermissions(@PathVariable Integer roleId, @RequestBody Integer[] permissionsId) {
+    @PostMapping("/{roleId}/update")
+    public MyResponse<Boolean> updatePermissions(@PathVariable Integer roleId, @RequestBody Integer[] permissionsId) {
          boolean added;
         try {
-           added = permissionsService.addPermissions(roleId, permissionsId);
+           added = permissionsService.updatePermissions(roleId, permissionsId);
         } catch (Exception e) {
-            return new MyResponse<>(ResultCode.FAILED.getCode(), "新增失败" + e.getMessage(), false);
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "修改失败" + e.getMessage(), false);
         }
         if (added) {
-            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "新增成功", true);
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "修改成功", true);
         } else {
-            return new MyResponse<>(ResultCode.FAILED.getCode(), "新增失败", false);
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "修改失败", false);
         }
 
     }
+
+
+//    /**
+//     * 获取角色权限列表（树）
+//     * @param roleId 角色id
+//     * @return 权限列表
+//     */
+//    @GetMapping("/{roleId}/tree")
+//    public MyResponse<List<Permissions>> getPermissionsTreeByRoleId(@PathVariable Integer roleId) {
+//        List<Permissions> permissions = null;
+//        try {
+//            permissions = permissionsService.getPermissionsTreeByRoleId(roleId);
+//            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "查询成功", permissions);
+//        } catch (Exception e) {
+//            return new MyResponse<>(ResultCode.NOT_FOUND.getCode(), "查询失败" + e.getMessage(), null);
+//        }
+//    }
 }
 

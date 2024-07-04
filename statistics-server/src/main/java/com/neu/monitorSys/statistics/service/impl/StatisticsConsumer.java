@@ -25,10 +25,10 @@ public class StatisticsConsumer {
             UpdateWrapper<Statistics> updateWrapper = new UpdateWrapper<>();
             updateWrapper.eq("af_id",reportDTO.getAfId());
             Statistics statistics = new Statistics();
-            statistics.setSo2Aqi(data[0]);
-            statistics.setCoAqi(data[1]);
-            statistics.setSpmAqi(data[2]);
-            statistics.setAqi(data[3]);
+            statistics.setSo2Aqi( data[0]);
+            statistics.setCoAqi( data[1]);
+            statistics.setSpmAqi( data[2]);
+            statistics.setAqi( data[3]);
             statisticsMapper.update(statistics,updateWrapper);
         }
     }

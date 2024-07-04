@@ -1,6 +1,6 @@
 package com.neu.monitorSys.statistics.repository;
 
-import com.neu.monitorSys.statistics.entity.StatisticsES;
+import com.neu.monitorSys.common.entity.StatisticsES;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 

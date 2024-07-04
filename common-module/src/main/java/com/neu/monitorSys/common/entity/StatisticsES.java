@@ -1,4 +1,4 @@
-package com.neu.monitorSys.statistics.entity;
+package com.neu.monitorSys.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

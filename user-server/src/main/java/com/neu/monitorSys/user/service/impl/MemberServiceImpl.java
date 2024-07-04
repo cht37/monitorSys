@@ -17,6 +17,7 @@ import com.neu.monitorSys.user.DTO.MemberSearchDTO;
 import com.neu.monitorSys.user.client.RoleClient;
 import com.neu.monitorSys.common.constants.UserRedisPrefix;
 import com.neu.monitorSys.user.mapper.MemberMapper;
+import com.neu.monitorSys.user.repository.UserDetailRepository;
 import com.neu.monitorSys.user.service.IMemberService;
 import com.neu.monitorSys.user.util.RedisUtil;
 import io.seata.spring.annotation.GlobalTransactional;
@@ -47,6 +48,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Autowired
     private RoleClient roleClient;
+
+    @Autowired
+    private UserDetailRepository userDetailRepository;
 
 
     @Override
@@ -100,19 +104,30 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         List<Roles> roles = memberMapper.getRolesByMemberId(memberId);
         //根据角色id获取权限名称列表
         Set<String> permissions=new HashSet<>();
-        roles.forEach(role -> {
-            List<Permissions> permissionList =roleClient.getPermissionsByRoleId(role.getId()).getData();
-           permissionList.stream().map(Permissions::getPermissionName).forEach(permissions::add);
-        });
+       //遍历角色集合
+        for (Roles role : roles) {
+            List<Permissions> permissionsByRoleId = roleClient.getPermissionsByRoleId(role.getId()).getData();
+           //由于权限有子权限，需要dfs遍历
+           addPermissions(permissionsByRoleId,permissions);
+        }
         MemberWithRole memberWithRole = new MemberWithRole();
         memberWithRole.setMember(member);
         memberWithRole.setRoles(roles);
         memberWithRole.setPermissions(permissions);
+        String rolesString = roles.toString();
         //将用户信息存入redis，有效期为5小时
-        redisUtil.set(UserRedisPrefix.USER_ROLE_PREFIX + logId, JSONUtil.toJsonStr(memberWithRole), 60 * 60 * 5);
+//        redisUtil.set(UserRedisPrefix.USER_ROLE_PREFIX+":"+rolesString+":" + logId, JSONUtil.toJsonStr(memberWithRole), 60 * 60 * 5);
+        userDetailRepository.saveUserDetail(logId,memberWithRole,60*60*5);
         return memberWithRole;
     }
-
+    public void addPermissions(List<Permissions> permissionsList,Set<String> permissions){
+        for(Permissions permission:permissionsList){
+            permissions.add(permission.getPermissionName());
+            if (permission.getChildSysMenu()!=null&&permission.getChildSysMenu().size()>0){
+                addPermissions(permission.getChildSysMenu(),permissions);
+            }
+        }
+    }
     @Override
     public IPage<MemberWithRole> selectMembers(MemberSearchDTO memberSearchDTO, Integer page, Integer size) {
         LambdaQueryWrapper<Member> wrapper = new LambdaQueryWrapper<>();

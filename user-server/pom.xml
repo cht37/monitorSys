@@ -82,5 +82,4 @@
             <artifactId>feign-okhttp</artifactId>
         </dependency>
     </dependencies>
-
 </project>

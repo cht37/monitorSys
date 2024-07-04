@@ -3,11 +3,20 @@
   <component name="fastRequestCurrentParamGroup">
     <option name="clasDescription" value="&lt;p&gt; 前端控制器 &lt;/p&gt;" />
     <option name="className" value="com.neu.monitorSys.statistics.controller.StatisticsController" />
-    <option name="filePath" value="/.fastRequest/collections/Root/statistics-server/StatisticsController~getProvinceAqiStatistics.rapi" />
-    <option name="method" value="getProvinceAqiStatistics" />
-    <option name="methodDescription" value="获取省级空气质量统计信息" />
+    <option name="filePath" value="/.fastRequest/collections/Root/statistics-server/StatisticsController~getProvincePollutionStats.rapi" />
+    <option name="method" value="getProvincePollutionStats" />
+    <option name="methodDescription" value="根据省份聚合，获取三种污染物超标次数 超标：指的是污染等级大于等于4级" />
     <option name="module" value="statistics-server" />
-    <option name="originUrl" value="/api/v1/statistics/province" />
+    <option name="originUrl" value="/api/v1/statistics/pollution" />
+    <option name="requestParamMap">
+      <map>
+        <entry key="level">
+          <value>
+            <Object />
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="responseParamMap">
       <map>
         <entry key="return">
@@ -19,6 +28,6 @@
     </option>
     <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
     <option name="tempId" value="" />
-    <option name="url" value="/api/v1/statistics/province" />
+    <option name="url" value="/api/v1/statistics/pollution" />
   </component>
 </project>

@@ -1,18 +1,19 @@
-package com.neu.monitorSys.gateway;
+package com.neu.monitorSys.gateway.fliter;
 
 import cn.hutool.core.util.StrUtil;
 import com.neu.monitorSys.common.DTO.MyResponse;
-import com.neu.monitorSys.common.constants.SecurityConstants;
 import com.neu.monitorSys.common.constants.ResultCode;
+import com.neu.monitorSys.common.constants.SecurityConstants;
 import com.neu.monitorSys.gateway.client.AuthClient;
 import com.neu.monitorSys.gateway.config.AuthConfig;
-import com.neu.monitorSys.gateway.util.RedisUtil;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
@@ -24,11 +25,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 @Order(1)
 @Component
@@ -41,16 +39,19 @@ public class AuthorizationFilter implements GlobalFilter {
     @Lazy
     private AuthClient authClient;
 
-    private final WebClient webClient;
-    @Resource
-    private RedisUtil redisUtil;
+    private final ExecutorService executorService;
+
 
     @Resource
     private AuthConfig myConfig;
 
-    public AuthorizationFilter(WebClient.Builder webClientBuilder) {
-       this.webClient = webClientBuilder.baseUrl("lb://auth-server").build();
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    public AuthorizationFilter() {
+        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
+
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -63,7 +64,7 @@ public class AuthorizationFilter implements GlobalFilter {
         request = exchange.getRequest().mutate().headers(httpHeaders -> httpHeaders.remove(SecurityConstants.FROM)).build();
         //1、获取请求路径
         String path = request.getURI().getPath();
-        String api= request.getMethod().name()+" "+path;
+        String api = request.getMethod().name() + " " + path;
 
 
         //处理白名单内不需要进行拦截的地址
@@ -120,20 +121,22 @@ public class AuthorizationFilter implements GlobalFilter {
         response.getHeaders().add("Content-Type", "text/plain;charset=UTF-8");
         return response.writeWith(Mono.just(buffer));
     }
-        private MyResponse<String> getAuthResult(String token,String api){
-             CompletableFuture<MyResponse<String>> future = CompletableFuture.supplyAsync(
-                      // 在异步包装内执行我们的微服务请求
-                        () -> authClient.validate(token, api)
-             );
-                try {
-                    // 等待相应返回结果
-                    return future.get();
-                } catch (Exception ex) {
-                    String msg = "网关检查接口是否存在,发生异常";
-                    log.error(msg, ex);
-                    throw new RuntimeException(msg);
-                }
-            //线程池
+
+    //    private MyResponse<String> getAuthResult(String token, String api) {
+//        CompletableFuture<MyResponse<String>> future = CompletableFuture.supplyAsync(
+//                // 在异步包装内执行我们的微服务请求
+//                () -> authClient.validate(token, api)
+//        );
+//        try {
+//            // 等待相应返回结果
+//            return future.get();
+//        } catch (Exception ex) {
+//            String msg = "网关检查接口是否存在,发生异常";
+//            log.error(msg, ex);
+//            throw new RuntimeException(msg);
+//        }
+//    }
+    //线程池
 //            ExecutorService executorService = Executors.newCachedThreadPool();
 //            Mono<MyResponse> responseMono = webClient.get()
 //                    .uri("/api/v1/auth/validate?"+"originURI=" + api)
@@ -142,6 +145,21 @@ public class AuthorizationFilter implements GlobalFilter {
 //                    .bodyToMono(MyResponse.class);
 //            MyResponse result = responseMono.block(Duration.ofSeconds(1));
 //            return result;
+//
+    private MyResponse<String> getAuthResult(String token, String api) {
+        WebClient webClient = webClientBuilder.build();
+        String url = "http://auth-server/api/v1/auth/validate?originURI=" + api;
+        Mono<MyResponse<String>> mono = webClient.get().uri(url).header("Authorization", token).retrieve().bodyToMono(new ParameterizedTypeReference<MyResponse<String>>() {
+        });
+        Future future = executorService.submit((Callable<MyResponse<String>>) () -> mono.block());
+        try {
+            return (MyResponse<String>) future.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("网关检查接口是否存在,发生异常", e);
+            throw new RuntimeException("网关检查接口是否存在,发生异常");
+        } catch (TimeoutException e) {
+            throw new RuntimeException("网关检查接口是否存在,超时异常");
         }
+    }
 }
 

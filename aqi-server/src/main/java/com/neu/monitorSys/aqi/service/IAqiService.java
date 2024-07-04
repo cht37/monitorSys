@@ -33,4 +33,12 @@ public interface IAqiService extends IService<Aqi> {
          * @return aqi级别
          */
         List<AqiDTO> getAqiLevelByValue(int SO2,int CO,int SPM);
+
+
+        /**
+         * 根据污染等级，获取污染物最低值
+         * @param level 污染等级
+         * @return 污染物最低值
+         */
+        int[] getMinValueByLevel(int level);
 }

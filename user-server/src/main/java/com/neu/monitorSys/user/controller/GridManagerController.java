@@ -171,6 +171,42 @@ public class GridManagerController {
         return new MyResponse<>(ResultCode.FAILED.getCode(), "修改失败", false);
     }
 
+    /**
+     * 新增网格员记录
+     * @param logId 网格员id
+     * @return 是否新增成功
+     */
+    @PostMapping
+    public MyResponse<Boolean> addGridManager(@RequestParam String logId) {
+        boolean result = false;
+        try {
+            result = gridManagerService.addGridManager(logId);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "新增失败" + e.getMessage(), false);
+        }
+        if (result) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "新增成功", true);
+        }
+        return new MyResponse<>(ResultCode.FAILED.getCode(), "新增失败", false);
+    }
 
+    /**
+     * 删除网格员记录（逻辑）
+     * @param logId 网格员id
+     * @return 是否删除成功
+     */
+    @DeleteMapping
+    public MyResponse<Boolean> deleteGridManager(@RequestParam String logId) {
+        boolean result = false;
+        try {
+            result = gridManagerService.deleteGridManager(logId);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(), "删除失败" + e.getMessage(), false);
+        }
+        if (result) {
+            return new MyResponse<>(ResultCode.SUCCESS.getCode(), "删除成功", true);
+        }
+        return new MyResponse<>(ResultCode.FAILED.getCode(), "删除失败", false);
+    }
 }
 

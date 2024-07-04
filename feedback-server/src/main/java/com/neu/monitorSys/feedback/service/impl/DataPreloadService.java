@@ -2,7 +2,9 @@ package com.neu.monitorSys.feedback.service.impl;
 
 
 import com.neu.monitorSys.common.entity.AqiFeedback;
+import com.neu.monitorSys.feedback.constants.FeedbackRedisPrefix;
 import com.neu.monitorSys.feedback.service.IAqiFeedbackService;
+import com.neu.monitorSys.feedback.util.RedisUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ public class DataPreloadService {
     private AqiFeedbackRepository aqiFeedbackRepository;
     @Autowired
     private IAqiFeedbackService aqiFeedbackService;
+    @Autowired
+    private RedisUtil redisUtil;
     private static final int PAGE_NUM = 5;
     private static final int PAGE_SIZE = 100;
 
@@ -26,14 +30,15 @@ public class DataPreloadService {
      */
     @PostConstruct
     public void dataPreload() {
-        //判断是否已经加载过数据
-        if (aqiFeedbackRepository.findFeedbackByPage("1", 1, 5) != null) {
-            return;
-        }
+        //删除旧数据
+        redisUtil.del(FeedbackRedisPrefix.FEEDBACK_LIST);
+        redisUtil.del(FeedbackRedisPrefix.FEEDBACK_DATA);
+        //获取5页数据
         List<AqiFeedback> feedbacks = aqiFeedbackService.findPageBackByPage(5, 100);
         if (feedbacks == null) {
             return;
         }
+        //存入redis
         aqiFeedbackRepository.saveFeedback(feedbacks);
     }
 }

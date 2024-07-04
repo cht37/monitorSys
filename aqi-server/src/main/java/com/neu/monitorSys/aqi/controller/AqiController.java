@@ -78,9 +78,9 @@ public class AqiController {
 
     /**
      * 根据污染物值获取aqi级别
-     * @param SO2
-     * @param CO
-     * @param SPM
+     * @param SO2 so2值
+     * @param CO  co值
+     * @param SPM spm值
      * @return MyResponse<List<AqiDTO>> 返回aqi级别
      */
     @GetMapping("/level/list")
@@ -93,5 +93,23 @@ public class AqiController {
         }
         return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", aqiDTO);
     }
+
+
+    /**
+     * 根据污染等级，获取污染物最低值
+     * @param level 污染等级
+     * @return MyResponse<int[]> 返回污染物最低值
+     */
+    @GetMapping("/min-value/{level}")
+    public MyResponse<int[]> getMinValueByLevel(@PathVariable int level){
+        int[] minValues;
+        try {
+            minValues = aqiService.getMinValueByLevel(level);
+        } catch (Exception e) {
+            return new MyResponse<>(ResultCode.FAILED.getCode(),"fail"+ e.getMessage(), null);
+        }
+        return new MyResponse<>(ResultCode.SUCCESS.getCode(), "success", minValues);
+    }
+
 }
 

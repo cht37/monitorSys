@@ -2,7 +2,6 @@ package com.neu.monitorSys.statistics.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,6 +12,8 @@ import com.neu.monitorSys.common.constants.ResultCode;
 import com.neu.monitorSys.common.entity.AqiFeedback;
 import com.neu.monitorSys.common.entity.GridManager;
 import com.neu.monitorSys.common.entity.Statistics;
+import com.neu.monitorSys.common.entity.StatisticsES;
+import com.neu.monitorSys.statistics.DTO.PollutionStatisticsDTO;
 import com.neu.monitorSys.statistics.DTO.ProvinceAqiStatsDTO;
 import com.neu.monitorSys.statistics.DTO.ReportDTO;
 import com.neu.monitorSys.statistics.DTO.StatisticsQueryDTO;
@@ -21,13 +22,13 @@ import com.neu.monitorSys.statistics.client.AqiClient;
 import com.neu.monitorSys.statistics.client.FeedbackClient;
 import com.neu.monitorSys.statistics.client.GeoClient;
 import com.neu.monitorSys.statistics.client.UserClient;
-import com.neu.monitorSys.statistics.entity.StatisticsES;
+import com.neu.monitorSys.statistics.entity.AqiStatisticsPercent;
 import com.neu.monitorSys.statistics.mapper.StatisticsMapper;
 import com.neu.monitorSys.statistics.publisher.StatisticsPublisher;
 import com.neu.monitorSys.statistics.repository.EsStatisticsRepository;
 import com.neu.monitorSys.statistics.service.IStatisticsService;
+import com.neu.monitorSys.statistics.utils.StatisticsUtil;
 import io.seata.spring.annotation.GlobalTransactional;
-
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -36,20 +37,29 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.Avg;
+import org.elasticsearch.search.aggregations.metrics.ValueCount;
+import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-
 import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -79,14 +89,17 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
     @Autowired
     private StatisticsPublisher statisticsPublisher;
 
-     @Autowired
+    @Autowired
     private EsStatisticsRepository repository;
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
+    @Autowired
+    private StatisticsUtil statisticsUtil;
 
-     @Autowired
+
+    @Autowired
     private RestHighLevelClient client;
 
     /**
@@ -160,7 +173,7 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
         if (code != ResultCode.SUCCESS.getCode()) {
             throw new RuntimeException("网格员状态修改失败");
         }
-        boolean send = false;
+        boolean send;
         try {
             send = statisticsPublisher.sendStaticsData(reportDTO);
         } catch (Exception e) {
@@ -448,7 +461,7 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
 
 
     @Override
-    public SearchPage<StatisticsES> queryStatisticsDataES(StatisticsQueryDTO statisticsQueryDTO, int page, int size) {
+    public IPage<StatisticsVO> queryStatisticsDataES(StatisticsQueryDTO statisticsQueryDTO, int page, int size) {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
         // 添加查询条件
@@ -459,8 +472,8 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
             boolQuery.must(QueryBuilders.termQuery("af_id", statisticsQueryDTO.getAfId()));
         }
         //如果省市区名称有一个不为空，则添加查询条件，需要首先查询省份编号
-        String provinceId=null, cityId = null, districtId=null;
-        if (statisticsQueryDTO.getProvinceName() != null||statisticsQueryDTO.getCityName() != null||statisticsQueryDTO.getDistrictName() != null) {
+        String provinceId = null, cityId = null, districtId = null;
+        if (statisticsQueryDTO.getProvinceName() != null || statisticsQueryDTO.getCityName() != null || statisticsQueryDTO.getDistrictName() != null) {
             if (statisticsQueryDTO.getProvinceName() == null) {
                 throw new RuntimeException("省份名称不能为空");
             }
@@ -483,14 +496,14 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
 
         }
 
-        if (provinceId!=null) {
+        if (provinceId != null) {
             boolQuery.must(QueryBuilders.termQuery("province_id.keyword", provinceId));
         }
-        if (cityId!=null) {
+        if (cityId != null) {
             boolQuery.must(QueryBuilders.termQuery("city_id.keyword", cityId));
         }
         if (districtId != null) {
-            boolQuery.must(QueryBuilders.termQuery("district_id.keyword",districtId));
+            boolQuery.must(QueryBuilders.termQuery("district_id.keyword", districtId));
         }
         if (statisticsQueryDTO.getAddress() != null) {
             boolQuery.must(QueryBuilders.termQuery("address.keyword", statisticsQueryDTO.getAddress()));
@@ -536,33 +549,53 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
 
         // 添加排序条件
         if (statisticsQueryDTO.getSo2Ascending() != null) {
-            searchQueryBuilder.withSort(SortBuilders.fieldSort("so2_value")
+            searchQueryBuilder.withSorts(SortBuilders.fieldSort("so2_value")
                     .order(statisticsQueryDTO.getSo2Ascending() ? SortOrder.ASC : SortOrder.DESC));
         }
         if (statisticsQueryDTO.getCoAscending() != null) {
-            searchQueryBuilder.withSort(SortBuilders.fieldSort("co_value")
+            searchQueryBuilder.withSorts(SortBuilders.fieldSort("co_value")
                     .order(statisticsQueryDTO.getCoAscending() ? SortOrder.ASC : SortOrder.DESC));
         }
         if (statisticsQueryDTO.getSpmAscending() != null) {
-            searchQueryBuilder.withSort(SortBuilders.fieldSort("spm_value")
+            searchQueryBuilder.withSorts(SortBuilders.fieldSort("spm_value")
                     .order(statisticsQueryDTO.getSpmAscending() ? SortOrder.ASC : SortOrder.DESC));
         }
         if (statisticsQueryDTO.getAqiAscending() != null) {
-            searchQueryBuilder.withSort(SortBuilders.fieldSort("aqi")
+            searchQueryBuilder.withSorts(SortBuilders.fieldSort("aqi")
                     .order(statisticsQueryDTO.getAqiAscending() ? SortOrder.ASC : SortOrder.DESC));
         }
-
+        SearchPage<StatisticsES> searchPage = null;
         // 执行查询
         if (boolQuery.hasClauses()) {
             NativeSearchQuery searchQuery = searchQueryBuilder.build();
             SearchHits<StatisticsES> searchHits = elasticsearchRestTemplate.search(searchQuery, StatisticsES.class);
-            return SearchHitSupport.searchPageFor(searchHits, PageRequest.of(page, size));
+            searchPage = SearchHitSupport.searchPageFor(searchHits, PageRequest.of(page, size));
         } else {
-            SearchPage<StatisticsES> searchPage = queryAllStatisticsData(page, size);
-            return searchPage;
+            searchPage = queryAllStatisticsData(page, size);
         }
+        //转换为List<StatisticsES>
+        List<StatisticsES> statistics = searchPage.getSearchHits().stream().map(SearchHit::getContent).toList();
+        //转换为List<StatisticsVO>
+//        List<StatisticsVO> statisticsVOS = searchStatisticsData(statistics);
+        List<StatisticsVO> statisticsVOS = statisticsUtil.searchStatisticsData(statistics);
+        //返回查询结果
+        IPage<StatisticsVO> statisticsVOIPage = new Page<>();
+        statisticsVOIPage.setRecords(statisticsVOS);
+        statisticsVOIPage.setTotal(searchPage.getTotalElements());
+        statisticsVOIPage.setPages(searchPage.getTotalPages());
+        statisticsVOIPage.setCurrent(page);
+        statisticsVOIPage.setSize(size);
+        return statisticsVOIPage;
     }
-     public SearchPage<StatisticsES> queryAllStatisticsData(int page, int size) {
+
+    /**
+     * 查询所有统计数据es
+     *
+     * @param page 页数
+     * @param size 每页大小
+     * @return 统计数据
+     */
+    public SearchPage<StatisticsES> queryAllStatisticsData(int page, int size) {
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.matchAllQuery())
                 .withPageable(PageRequest.of(page, size))
@@ -586,28 +619,33 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
 
     /**
      * 获取省级空气质量统计信息
-     * @return 省级空气质量统计信息
+     *
+     * @return List 省级空气质量统计信息
      * @throws IOException IO异常
      */
     @Override
-   public List<ProvinceAqiStatsDTO> getProvinceAqiStatistics() throws IOException {
-            SearchRequest searchRequest = new SearchRequest("statistics_es");
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-            searchSourceBuilder.aggregation(AggregationBuilders.terms("by_province")
-                    .field("province_id.keyword")
-                    .subAggregation(AggregationBuilders.avg("avg_so2_value").field("so2_value"))
-                    .subAggregation(AggregationBuilders.avg("avg_co_value").field("co_value"))
-                    .subAggregation(AggregationBuilders.avg("avg_spm_value").field("spm_value"))
-                    .subAggregation(AggregationBuilders.avg("avg_aqi").field("aqi"))
-            );
-            searchSourceBuilder.size(0); // We don't need the actual documents, just the aggregation results
-            searchRequest.source(searchSourceBuilder);
+    public List<ProvinceAqiStatsDTO> getProvinceAqiStatistics() throws IOException {
+        SearchRequest searchRequest = new SearchRequest("statistics_es");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //时间范围，最近一周
+        searchSourceBuilder.query(QueryBuilders.rangeQuery("confirm_datetime")
+                .gte("now-7d/d")
+                .lte("now/d"));
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchSourceBuilder.aggregation(AggregationBuilders.terms("by_province")
+                .field("province_id.keyword")
+                .subAggregation(AggregationBuilders.avg("avg_so2_value").field("so2_value"))
+                .subAggregation(AggregationBuilders.avg("avg_co_value").field("co_value"))
+                .subAggregation(AggregationBuilders.avg("avg_spm_value").field("spm_value"))
+                .subAggregation(AggregationBuilders.avg("avg_aqi").field("aqi"))
+        );
+        searchSourceBuilder.size(0); // We don't need the actual documents, just the aggregation results
+        searchRequest.source(searchSourceBuilder);
 
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
-            Aggregations aggregations = searchResponse.getAggregations();
-            Terms byProvince = aggregations.get("by_province");
+        Aggregations aggregations = searchResponse.getAggregations();
+        Terms byProvince = aggregations.get("by_province");
 
         List<ProvinceAqiStatsDTO> stats = new ArrayList<>();
         for (Terms.Bucket bucket : byProvince.getBuckets()) {
@@ -623,8 +661,120 @@ public class StatisticsServiceImpl extends ServiceImpl<StatisticsMapper, Statist
             dto.setAvgAqi(avgAqi.getValue());
             stats.add(dto);
         }
+        for (ProvinceAqiStatsDTO stat : stats) {
+            String provinceName = (String) geoClient.getProvinceName(stat.getProvinceId()).getData();
+            stat.setProvinceName(provinceName);
+        }
+        return stats;
+    }
+
+    @Override
+    public List<AqiStatisticsPercent> getAqiLevelPercent() throws IOException {
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.matchAllQuery())
+                .build();
+        SearchHits<AqiStatisticsPercent> searchHits = elasticsearchRestTemplate.search(searchQuery, AqiStatisticsPercent.class);
+        return searchHits.getSearchHits().stream().map(SearchHit::getContent).collect(Collectors.toList());
+
+    }
+
+    /**
+     * 获取省级污染统计信息
+     *
+     * @param level 污染等级
+     * @return 省级污染统计信息（每个周大于污染物限额的次数）
+     * @throws IOException
+     */
+    @Override
+    public List<PollutionStatisticsDTO> getProvincePollutionStats(Integer level) throws IOException {
+        // 获取污染限值
+        MyResponse<int[]> response = aqiClient.getMinValueByLevel(level);
+        if (response.getStatusCode() != ResultCode.SUCCESS.getCode()) {
+            throw new RuntimeException("获取污染限值失败");
+        }
+        int[] minValues = response.getData();
+        int so2Min = minValues[0];
+        int coMin = minValues[1];
+        int spmMin = minValues[2];
+
+        // 构建查询
+        SearchRequest searchRequest = new SearchRequest("statistics_es");
+
+        // 省份聚合
+        TermsAggregationBuilder provinceAgg = AggregationBuilders.terms("by_province")
+                .field("province_id.keyword");
+
+        // 按周统计
+        DateHistogramAggregationBuilder weekAgg = AggregationBuilders.dateHistogram("by_week")
+                .field("confirm_datetime")
+                .calendarInterval(DateHistogramInterval.WEEK);
+
+        // 计算SO2超标次数
+        FilterAggregationBuilder so2ExceedFilter = AggregationBuilders.filter("so2_exceed_filter",
+                QueryBuilders.rangeQuery("so2_value").gte(so2Min));
+        ValueCountAggregationBuilder so2ExceedCount = AggregationBuilders.count("so2_exceed_count")
+                .field("so2_value");
+        so2ExceedFilter.subAggregation(so2ExceedCount);
+
+        // 计算CO超标次数
+        FilterAggregationBuilder coExceedFilter = AggregationBuilders.filter("co_exceed_filter",
+                QueryBuilders.rangeQuery("co_value").gte(coMin));
+        ValueCountAggregationBuilder coExceedCount = AggregationBuilders.count("co_exceed_count")
+                .field("co_value");
+        coExceedFilter.subAggregation(coExceedCount);
+
+        // 计算SPM超标次数
+        FilterAggregationBuilder spmExceedFilter = AggregationBuilders.filter("spm_exceed_filter",
+                QueryBuilders.rangeQuery("spm_value").gte(spmMin));
+        ValueCountAggregationBuilder spmExceedCount = AggregationBuilders.count("spm_exceed_count")
+                .field("spm_value");
+        spmExceedFilter.subAggregation(spmExceedCount);
+
+        // 添加聚合
+        weekAgg.subAggregation(so2ExceedFilter);
+        weekAgg.subAggregation(coExceedFilter);
+        weekAgg.subAggregation(spmExceedFilter);
+
+        provinceAgg.subAggregation(weekAgg);
+
+        // 构建请求对象
+        searchRequest.source().query(QueryBuilders.matchAllQuery())
+                .aggregation(provinceAgg);
+
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+        Terms provinceTerms = searchResponse.getAggregations().get("by_province");
+        List<PollutionStatisticsDTO> stats = new ArrayList<>();
+
+        for (Terms.Bucket provinceBucket : provinceTerms.getBuckets()) {
+            String provinceName = provinceBucket.getKeyAsString();
+            Histogram weeks = provinceBucket.getAggregations().get("by_week");
+
+            for (Histogram.Bucket weekBucket : weeks.getBuckets()) {
+                PollutionStatisticsDTO dto = new PollutionStatisticsDTO();
+                dto.setProvinceName(provinceName);
+                String string = weekBucket.getKeyAsString();
+                LocalDateTime time = LocalDateTime.parse(string, DateTimeFormatter.ISO_DATE_TIME);
+                dto.setTime(time);
+
+                Filter so2Exceed = weekBucket.getAggregations().get("so2_exceed_filter");
+                long so2ExceedCountValue = ((ValueCount) so2Exceed.getAggregations().get("so2_exceed_count")).getValue();
+                dto.setSo2ExceedTimes((int) so2ExceedCountValue);
+
+                Filter coExceed = weekBucket.getAggregations().get("co_exceed_filter");
+                long coExceedCountValue = ((ValueCount) coExceed.getAggregations().get("co_exceed_count")).getValue();
+                dto.setCoExceedTimes((int) coExceedCountValue);
+
+                Filter spmExceed = weekBucket.getAggregations().get("spm_exceed_filter");
+                long spmExceedCountValue = ((ValueCount) spmExceed.getAggregations().get("spm_exceed_count")).getValue();
+                dto.setSpmExceedTimes((int) spmExceedCountValue);
+
+                stats.add(dto);
+            }
+        }
 
         return stats;
     }
+
 
 }

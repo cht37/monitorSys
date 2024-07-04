@@ -96,6 +96,17 @@ public class AqiServiceImpl extends ServiceImpl<AqiMapper, Aqi> implements IAqiS
         return List.of(so2, co, spm, aqi);
     }
 
+    @Override
+    public int[] getMinValueByLevel(int level) {
+        List<Aqi> allAqi = getAllAqi();
+        for (Aqi aqi : allAqi) {
+            if (aqi.getAqiId().equals(level)) {
+                return new int[]{aqi.getSo2Min(), aqi.getCoMin(), aqi.getSpmMin()};
+            }
+        }
+        return null;
+    }
+
 
     private record Result(int lowConcentration, int highConcentration) {
     }

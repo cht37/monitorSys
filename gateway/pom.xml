@@ -15,6 +15,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <reactor.feign.version>3.2.6</reactor.feign.version>
     </properties>
     <dependencies>
         <!-- WebClient -->
@@ -91,6 +92,23 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+<!--        &lt;!&ndash;reactive feign&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.playtika.reactivefeign</groupId>-->
+<!--            <artifactId>feign-reactor-spring-configuration</artifactId>-->
+<!--            <version>${reactor.feign.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.playtika.reactivefeign</groupId>-->
+<!--            <artifactId>feign-reactor-webclient</artifactId>-->
+<!--            <version>${reactor.feign.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.playtika.reactivefeign</groupId>-->
+<!--            <artifactId>feign-reactor-cloud</artifactId>-->
+<!--            <version>${reactor.feign.version}</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;reactive feign&ndash;&gt;-->
     </dependencies>
 
 </project>

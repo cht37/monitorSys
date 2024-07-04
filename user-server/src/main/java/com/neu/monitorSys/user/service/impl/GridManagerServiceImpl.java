@@ -292,4 +292,45 @@ public class GridManagerServiceImpl extends ServiceImpl<GridManagerMapper, GridM
         updateWrapper.set("state", state);
         return update(updateWrapper);
     }
+
+    @Override
+    @Transactional
+    public boolean addGridManager(String logId) {
+        //判断网格员是否存在
+        Member member = memberMapper.selectOne(new LambdaQueryWrapper<Member>().eq(Member::getLogid, logId));
+        if (member == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        //判断网格员记录是否存在
+        GridManager gridManager = getGridManagerByLogId(logId);
+        if (gridManager != null&&gridManager.getState()!=3) {
+            throw new RuntimeException("网格员记录已存在");
+        }
+        //新增网格员记录
+        gridManager = new GridManager();
+        gridManager.setMemberId(logId);
+        gridManager.setState(0);
+        gridManager.setRemark("新手网格员");
+        return save(gridManager);
+
+    }
+
+    @Override
+    public boolean deleteGridManager(String logId) {
+        //判断网格员是否存在
+        Member member = memberMapper.selectOne(new LambdaQueryWrapper<Member>().eq(Member::getLogid, logId));
+        if (member == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        //判断网格员记录是否存在
+        GridManager gridManager = getGridManagerByLogId(logId);
+        if (gridManager == null) {
+            throw new RuntimeException("网格员记录不存在");
+        }
+        //逻辑删除网格员记录
+        UpdateWrapper<GridManager> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("member_id", logId);
+        updateWrapper.set("state", 3);
+        return update(updateWrapper);
+    }
 }

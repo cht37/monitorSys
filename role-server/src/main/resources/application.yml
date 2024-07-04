@@ -3,11 +3,6 @@ server:
 spring:
   application:
     name: role-server
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver #数据库驱动包
-#    url: jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
-#    username: root
-#    password: cht021125
   devtools:
     restart:
       enabled: true #是否支持热部署cloud:
@@ -35,3 +30,20 @@ mybatis-plus:
 #      port: 6379
 #      timeout: 1800000
 #      password: cht021125
+
+# application.yml
+permissions:
+  dependencies:
+    "GET /api/v1/feedbacks/waiting-list":
+      - GET /api/v1/grid-managers/available
+    "GET /api/v1/grid-managers/available":
+      - GET /api/v1/feedbacks/waiting-list
+    "PUT /api/v1/roles/users/*/roles":
+      - GET /api/v1/roles
+    "GET /api/v1/permissions/tree":
+      - GET /api/v1/permissions/role/*
+    "GET /api/v1/permissions/role/*":
+      - GET /api/v1/permissions/tree
+    "POST /api/v1/feedbacks/assign":
+      - GET /api/v1/feedbacks/search
+      - GET /api/v1/grid-managers/search

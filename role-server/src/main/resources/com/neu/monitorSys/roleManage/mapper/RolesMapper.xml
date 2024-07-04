@@ -40,5 +40,22 @@
         from sys_user left join user_role ur on sys_user.id = ur.user_id
         WHERE ur.role_id = (SELECT id FROM roles WHERE nick_name = #{roleName})
     </select>
+    <select id="getRoleNameByPermissionId" resultType="String">
+    SELECT r.mname
+    FROM roles r
+    JOIN (
+        SELECT rp.role_id
+        FROM role_permission rp
+        WHERE rp.permission_id IN
+        <foreach collection="clue" item="permissionId" open="(" separator="," close=")">
+            #{permissionId}
+        </foreach>
+        GROUP BY rp.role_id
+        HAVING COUNT(DISTINCT rp.permission_id) =
+        <if test="clue != null">
+            ${clue.size()}
+        </if>
+    ) sub ON r.id = sub.role_id
+</select>
 
 </mapper>

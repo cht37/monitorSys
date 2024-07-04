@@ -50,7 +50,7 @@ public class AqiFeedbackRepository {
 
 
         public List<AqiFeedback> findFeedbackByPage (String telId,int page, int size){
-            long start = (page-1) * size;
+            long start = (long) (page - 1) * size;
             long end = start + size - 1;
             Set<Object> ids = redisUtil.zRange(FeedbackRedisPrefix.FEEDBACK_LIST + telId, start, end);
             if (CollectionUtils.isEmpty(ids)) {

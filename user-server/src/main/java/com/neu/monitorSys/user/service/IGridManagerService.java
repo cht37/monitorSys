@@ -63,4 +63,13 @@ public interface IGridManagerService extends IService<GridManager> {
      */
     boolean updateState(String logId, Integer state);
 
+    /**
+     * 新增网格员记录
+     */
+    boolean addGridManager(String logId);
+
+    /**
+     * 删除网格员记录（逻辑）
+     */
+    boolean deleteGridManager(String logId);
 }

@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-         <!--实体类模块        -->
+        <!--实体类模块        -->
         <dependency>
             <groupId>com.neu</groupId>
             <artifactId>common-module</artifactId>
@@ -81,5 +81,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.data</groupId>-->
+<!--            <artifactId>spring-data-elasticsearch</artifactId>-->
+<!--            <version>4.3.2</version>  &lt;!&ndash; 这个版本需要跟es服务器匹配 此处应该为4.4.X 因为parent项目不在控制es版本必须适配 &ndash;&gt;-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.elasticsearch.client</groupId>-->
+<!--            <artifactId>elasticsearch-rest-high-level-client</artifactId>-->
+<!--            <version>7.13.2</version>-->
+<!--        </dependency>-->
     </dependencies>
 </project>

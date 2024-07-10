@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p>  城市表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.geography.controller.CitiesController",
+		"className":"controller.com.neu.monitor_sys.geography.CitiesController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getCityId",

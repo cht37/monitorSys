@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p>  权限表前端控制器 </p>",
-		"className":"com.neu.monitorSys.roleManage.controller.PermissionsController",
+		"className":"controller.com.neu.monitor_sys.role_manage.PermissionsController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getPermissionsByRoleId",

@@ -16,7 +16,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"afId\": 1,\n  \"so2Value\": 1,\n  \"coValue\": 1,\n  \"spmValue\": 1,\n  \"remarks\": \"remarks_6lapq\"\n}",
 		"classDescription":"<p>  前端控制器 </p>",
-		"className":"com.neu.monitorSys.statistics.controller.StatisticsController",
+		"className":"controller.com.neu.monitor_sys.statistics.StatisticsController",
 		"headerParamsKeyValueList":[
 			{
 				"enabled":true,

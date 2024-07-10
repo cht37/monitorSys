@@ -14,8 +14,13 @@ auth:
     - /api/v1/auth/normal/register #普通注册
     - /api/v1/auth/password/change #修改密码
     - /api/v1/auth/pwd/reset #重置密码
-#    - /auth/refresh
+    - /api/v1/notification/feedback/connect
+    - /api/v1/auth/logout #退出登录
+    - /api/v1/notification/logout/connect #退出登录sse连接
+    - /api/v1/notification/logout/close #关闭sse连接
+    - /api/v1/notification/feedback/close #关闭sse连接
 #    - /auth/verify
+#    - /auth/refresh
 spring:
   application:
     name: gateway
@@ -52,13 +57,15 @@ spring:
           '[/**]':
             allowedOrigins:
               - "http://localhost:5173"
+              - "null"
             allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - PATCH
-              - DELETE
-              - OPTIONS
+              - "*"
+#              - GET
+#              - POST
+#              - PUT
+#              - PATCH
+#              - DELETE
+#              - OPTIONS
             allowedHeaders:
               - "*"
             allowCredentials: true
@@ -92,6 +99,19 @@ spring:
           uri: lb://notification-server
           predicates:
             - Path=/api/v1/notification/**
+          filters:
+            - RemoveResponseHeader=Transfer-Encoding
+            - RewriteResponseHeader=Connection,(.*),keep-alive
+            - RewriteResponseHeader=Cache-Control,(.*),no-cache
+            - DedupeResponseHeader=Connection RETAIN_FIRST
+            - name: AddResponseHeader
+              args:
+                name: X-Accel-Buffering
+                value: "no"
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
 
 
 

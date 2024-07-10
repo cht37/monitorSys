@@ -17,7 +17,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> 网格员表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.user.controller.GridManagerController",
+		"className":"controller.com.neu.monitor_sys.user.GridManagerController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"updateState",

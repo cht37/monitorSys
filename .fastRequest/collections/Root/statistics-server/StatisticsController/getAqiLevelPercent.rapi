@@ -17,7 +17,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> 前端控制器 </p>",
-		"className":"com.neu.monitorSys.statistics.controller.StatisticsController",
+		"className":"controller.com.neu.monitor_sys.statistics.StatisticsController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getAqiLevelPercent",

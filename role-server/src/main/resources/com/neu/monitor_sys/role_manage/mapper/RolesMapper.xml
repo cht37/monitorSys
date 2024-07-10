@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.monitor_sys.role_manage.mapper.RolesMapper">
+    <resultMap id="roleMap" type="com.neu.monitor_sys.role_manage.VO.PermissionRoleMapVO">
+        <result property="permissionUrl" column="permission_url"/>
+        <collection property="roleNames" ofType="java.lang.String" column="role_names" javaType="ArrayList"
+                    select="splitRoleNames"/>
+    </resultMap>
+    <select id="getRoleListByPermissionUrl" resultMap="roleMap">
+        SELECT p.api                 as permission_url,
+               GROUP_CONCAT(r.mname) as role_names
+        FROM permissions p
+                 LEFT JOIN role_permission rp ON p.id = rp.permission_id
+                 LEFT JOIN roles r ON rp.role_id = r.id where r.enable = 1
+        GROUP BY p.api
+    </select>
+   <!--查询    -->
+    <select id="getLogIdByRoleNames" resultType="java.lang.String" >
+        SELECT user_name
+        FROM sys_user
+        WHERE id IN (
+        SELECT user_id
+        FROM user_role
+        WHERE role_id IN (
+        SELECT id FROM roles WHERE nick_name IN
+        <foreach item="roleName" index="index" collection="roleNameList" open="(" separator="," close=")">
+            #{roleName}
+        </foreach>
+        )
+        GROUP BY user_id
+        HAVING COUNT(DISTINCT role_id) =
+        <foreach collection="roleNameList" item="item" open="" separator="+" close="">
+            1
+        </foreach>
+        )
+    </select>
+    <!--    -->
+    <select id="getLogIdByRoleName" resultType="java.lang.String">
+        SELECT user_name
+        from sys_user left join user_role ur on sys_user.id = ur.user_id
+        WHERE ur.role_id = (SELECT id FROM roles WHERE nick_name = #{roleName})
+    </select>
+    <select id="getRoleNameByPermissionId" resultType="String">
+    SELECT r.mname
+    FROM roles r
+    JOIN (
+        SELECT rp.role_id
+        FROM role_permission rp
+        WHERE rp.permission_id IN
+        <foreach collection="clue" item="permissionId" open="(" separator="," close=")">
+            #{permissionId}
+        </foreach>
+        GROUP BY rp.role_id
+        HAVING COUNT(DISTINCT rp.permission_id) =
+        <if test="clue != null">
+            ${clue.size()}
+        </if>
+    ) sub ON r.id = sub.role_id
+</select>
+
+</mapper>

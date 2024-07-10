@@ -15,7 +15,7 @@ spring:
       config:
         server-addr: 192.168.244.128:8848
   config:
-    import: nacos:database.yaml, nacos:redis.yaml,nacos:seata.yaml
+    import: nacos:database.yaml, nacos:redis.yaml,nacos:seata.yaml,nacos:rabbitmq.yaml
 
 
 

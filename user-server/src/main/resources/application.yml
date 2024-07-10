@@ -53,7 +53,7 @@ spring:
 #    publisher-returns: true
 #
 mybatis-plus:
-  type-aliases-package: com.neu.monitorSys.user.entity
+  type-aliases-package: com.neu.monitor_sys.user.entity
   configuration:
     call-setters-on-nulls: false
     map-underscore-to-camel-case: true

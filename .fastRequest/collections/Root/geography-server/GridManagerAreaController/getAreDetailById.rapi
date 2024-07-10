@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> grid_manager_area表前端控制器 </p>",
-		"className":"com.neu.monitorSys.geography.controller.GridManagerAreaController",
+		"className":"controller.com.neu.monitor_sys.geography.GridManagerAreaController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getAreDetailById",

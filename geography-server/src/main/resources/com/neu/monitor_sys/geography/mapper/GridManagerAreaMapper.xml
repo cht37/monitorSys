@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.monitor_sys.geography.mapper.GridManagerAreaMapper">
+    <resultMap id="areaMap" type="com.neu.monitor_sys.geography.DTO.GeographyVO">
+        <result column="area_name" property="address"/>
+        <result column="city_name" property="cityName"/>
+        <result column="province_name" property="provinceName"/>
+    </resultMap>
+    <select id="getAreDetailById" resultType="com.neu.monitor_sys.geography.DTO.GeographyVO" resultMap="areaMap">
+        SELECT a.area_name,
+               d.district_name,
+               c.city_name,
+               p.province_name
+        FROM grid_manager_area a
+                 JOIN
+            districts d ON a.district_id = d.district_id
+                 JOIN
+             cities c ON d.city_id = c.city_id
+                 JOIN
+             provinces p ON c.province_id = p.province_id
+        WHERE a.id= #{id}
+    </select>
+</mapper>

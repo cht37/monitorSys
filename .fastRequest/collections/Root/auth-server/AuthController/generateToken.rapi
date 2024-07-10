@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"logId\": \"logId_1pl2w\",\n  \"logPwd\": \"logPwd_u5zr8\"\n}",
 		"classDescription":"",
-		"className":"com.neu.monitorSys.auth.controller.AuthController",
+		"className":"controller.com.neu.monitor_sys.auth.AuthController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"{\n  \"logId\": \"No comment,Value =logId_1pl2w\",\n  \"logPwd\": \"No comment,Value =logPwd_u5zr8\"\n}",
 		"method":"generateToken",

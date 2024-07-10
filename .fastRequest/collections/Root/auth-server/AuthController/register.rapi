@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"",
-		"className":"com.neu.monitorSys.auth.controller.AuthController",
+		"className":"controller.com.neu.monitor_sys.auth.AuthController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"register",

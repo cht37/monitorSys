@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"afId\": 1,\n  \"logId\": \"logId_0sxmd\",\n  \"address\": \"address_gss18\",\n  \"remark\": \"remark_9whfq\"\n}",
 		"classDescription":"<p> 网格员表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.user.controller.GridManagerController",
+		"className":"controller.com.neu.monitor_sys.user.GridManagerController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"{\n  \"afId\": \"No comment,Value =1\",\n  \"logId\": \"No comment,Value =logId_0sxmd\",\n  \"address\": \"No comment,Value =address_gss18\",\n  \"remark\": \"No comment,Value =remark_9whfq\"\n}",
 		"method":"assignGridManager",

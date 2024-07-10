@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"telId\": \"telId_rxm19\",\n  \"provinceName\": \"北京市\",\n  \"cityName\": \"市辖区\",\n  \"districtName\": \"朝阳区\",\n  \"address\": \"address_7rb2p\",\n  \"information\": \"information_l3h8s\",\n  \"estimatedGrade\": 1,\n  \"afDate\": \"\",\n  \"afTime\": \"\",\n  \"remarks\": \"1234556\"\n}",
 		"classDescription":"<p> 公众监督反馈表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.feedback.controller.AqiFeedbackController",
+		"className":"controller.com.neu.monitor_sys.feedback.AqiFeedbackController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"{\n  \"telId\": \"公众监督员电话号码\",\n  \"provinceName\": \"反馈信息所在省区域名称\",\n  \"cityName\": \"反馈信息所在市区域名称\",\n  \"address\": \"反馈信息所在区域详细地址\",\n  \"information\": \"反馈信息描述\",\n  \"estimatedGrade\": \"反馈者对空气质量指数级别的预估等级\",\n  \"afDate\": \"反馈日期\",\n  \"afTime\": \"反馈时间\",\n  \"remarks\": \"备注\"\n}",
 		"method":"saveFeedback",

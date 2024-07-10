@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.monitor_sys.user.mapper.MemberMapper">
+    <!--       member对象-->
+
+
+    <select id="getRoleIdByLogId" resultType="java.lang.Integer">
+        select role_id
+        from user_role
+                 left join member on user_role.user_id = member.id
+        where member.logid = #{logid}
+    </select>
+
+    <select id="getRolesByMemberId" resultType="com.neu.monitor_sys.common.entity.Roles">
+        select id, mname,nick_name, enable,remark
+        from roles
+        where id in (select role_id from user_role where user_id = #{memberId})
+    </select>
+</mapper>

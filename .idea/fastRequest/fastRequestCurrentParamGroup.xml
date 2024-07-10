@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="fastRequestCurrentParamGroup">
-    <option name="clasDescription" value="&lt;p&gt; 前端控制器 &lt;/p&gt;" />
-    <option name="className" value="com.neu.monitorSys.statistics.controller.StatisticsController" />
-    <option name="filePath" value="/.fastRequest/collections/Root/statistics-server/StatisticsController~getProvincePollutionStats.rapi" />
-    <option name="method" value="getProvincePollutionStats" />
-    <option name="methodDescription" value="根据省份聚合，获取三种污染物超标次数 超标：指的是污染等级大于等于4级" />
-    <option name="module" value="statistics-server" />
-    <option name="originUrl" value="/api/v1/statistics/pollution" />
+    <option name="clasDescription" value="&lt;p&gt; 角色表 前端控制器 &lt;/p&gt;" />
+    <option name="className" value="com.neu.monitorSys.roleManage.controller.RolesController" />
+    <option name="filePath" value="/.fastRequest/collections/Root/role-server/RolesController~enableRole.rapi" />
+    <option name="method" value="enableRole" />
+    <option name="methodDescription" value="启用/禁用角色" />
+    <option name="methodType" value="PUT" />
+    <option name="module" value="role-server" />
+    <option name="originUrl" value="/api/v1/roles/{roleId}/enabled" />
     <option name="requestParamMap">
       <map>
-        <entry key="level">
+        <entry key="enabled">
+          <value>
+            <Object />
+          </value>
+        </entry>
+        <entry key="roleId">
           <value>
             <Object />
           </value>
@@ -26,8 +32,8 @@
         </entry>
       </map>
     </option>
-    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{}}" />
+    <option name="returnDocument" value="{&quot;statusCode&quot;:&quot;No comment,Type =Number&quot;,&quot;message&quot;:&quot;No comment,Type =String&quot;,&quot;data&quot;:{&quot;java.lang.Boolean&quot;:&quot;No comment,Type =Boolean&quot;}}" />
     <option name="tempId" value="" />
-    <option name="url" value="/api/v1/statistics/pollution" />
+    <option name="url" value="/api/v1/roles/{roleId}/enabled" />
   </component>
 </project>

@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p>  provinces表前端控制器 </p>",
-		"className":"com.neu.monitorSys.geography.controller.ProvincesController",
+		"className":"controller.com.neu.monitor_sys.geography.ProvincesController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getProvinceName",

@@ -17,7 +17,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"mobile\": \"mobile_ei45e\",\n  \"smsCode\": \"smsCode_zxdrk\"\n}",
 		"classDescription":"",
-		"className":"com.neu.monitorSys.auth.controller.AuthController",
+		"className":"controller.com.neu.monitor_sys.auth.AuthController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"{\n  \"mobile\": \"No comment,Value =mobile_ei45e\",\n  \"smsCode\": \"No comment,Value =smsCode_zxdrk\"\n}",
 		"method":"saveNormalUser",

@@ -19,6 +19,7 @@
         <module>statistics-server</module>
         <module>aqi-server</module>
         <module>notification-server</module>
+        <module>message-server</module>
     </modules>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

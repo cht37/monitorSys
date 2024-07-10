@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"",
-		"className":"com.neu.monitorSys.auth.controller.SmsController",
+		"className":"controller.com.neu.monitor_sys.auth.SmsController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"sendSmsCode",

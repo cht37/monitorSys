@@ -17,7 +17,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> 空气质量指数级别表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.aqi.controller.AqiController",
+		"className":"controller.com.neu.monitor_sys.aqi.AqiController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"calculateAqi",
@@ -51,7 +51,7 @@
 						"enabled":true,
 						"key":"message",
 						"type":"String",
-						"value":"message_udeor"
+						"value":"message_dj38w"
 					},
 					"data":{
 						"comment":"",

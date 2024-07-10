@@ -17,7 +17,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> 公众监督反馈表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.feedback.controller.AqiFeedbackController",
+		"className":"controller.com.neu.monitor_sys.feedback.AqiFeedbackController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getFeedbackByGridId",

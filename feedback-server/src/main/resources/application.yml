@@ -3,11 +3,6 @@ server:
 spring:
   application:
     name: feedback-server
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver #数据库驱动包
-#    url: jdbc:mysql://localhost:3306/monitor_sys?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
-#    username: root
-#    password: cht021125
   devtools:
     restart:
       enabled: true #是否支持热部署cloud:
@@ -21,21 +16,3 @@ spring:
         server-addr: 192.168.244.128:8848
   config:
     import: nacos:database.yaml, nacos:rabbitmq.yaml, nacos:redis.yaml,nacos:seata.yaml
-
-
-#  rabbitmq:
-#    virtual-host: /monitorTASK
-#    host: 192.168.92.128
-#    port: 5672
-#    username: monitorSys
-#    password: cht021125
-#    #确认消息已发送到交换机(Exchange)
-#    publisher-confirm-type: correlated
-#    #确认消息已发送到队列(Queue)
-#    publisher-returns: true
-#  data:
-#    redis:
-#      host: 192.168.92.128
-#      port: 6379
-#      timeout: 1800000
-#      password: cht021125

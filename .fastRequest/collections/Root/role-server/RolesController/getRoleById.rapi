@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"",
 		"classDescription":"<p> 角色表 前端控制器 </p>",
-		"className":"com.neu.monitorSys.roleManage.controller.RolesController",
+		"className":"controller.com.neu.monitor_sys.role_manage.RolesController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"",
 		"method":"getRoleById",

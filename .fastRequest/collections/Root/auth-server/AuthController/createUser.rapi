@@ -15,7 +15,7 @@
 	"paramGroup":{
 		"bodyKeyValueListJson":"{\n  \"id\": 1,\n  \"mnane\": \"mnane_4v05g\",\n  \"logid\": \"logid_mn51v\",\n  \"logpwd\": \"logpwd_6arh0\",\n  \"tel\": \"tel_vd4sr\",\n  \"gender\": \"gender_bwejk\",\n  \"birthday\": \"2024-06-04\",\n  \"roleid\": 1,\n  \"state\": 1\n}",
 		"classDescription":"",
-		"className":"com.neu.monitorSys.auth.controller.AuthController",
+		"className":"controller.com.neu.monitor_sys.auth.AuthController",
 		"headerParamsKeyValueList":[],
 		"jsonDocument":"{\n  \"id\": \"No comment,Value =1\",\n  \"mnane\": \"人员真实姓名，\",\n  \"logid\": \"登录名\",\n  \"logpwd\": \"登录密码\",\n  \"tel\": \"手机号\",\n  \"gender\": \"性别\",\n  \"birthday\": \"生日\",\n  \"roleid\": \"角色编码\",\n  \"state\": \"人员状态，默认为1：正常\"\n}",
 		"method":"createUser",

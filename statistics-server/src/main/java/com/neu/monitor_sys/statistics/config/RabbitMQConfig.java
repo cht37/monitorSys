@@ -12,33 +12,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-//    /**
-//     * 配置交换机，反馈信息交换机，用于接收反馈信息
-//     * @return
-//     */
-//    @Bean
-//    public FanoutExchange statisticsExchange(){
-//        return new FanoutExchange("statisticsExchange");
-//    }
-
-//    /**
-//     * 配置队列，数据队列
-//     * @return
-//     */
-//    @Bean
-//    public Queue dataQueue(){
-//        return new Queue("dataQueue");
-//    }
-//TODO 配置死信队列
-
-//    /**
-//     * 配置死信队列
-//     */
-//    @Bean
-//    public Queue deadQueue(){
-//        return new Queue("deadQueue");
-//    }
-
 
     //配置消息转换器
     @Bean

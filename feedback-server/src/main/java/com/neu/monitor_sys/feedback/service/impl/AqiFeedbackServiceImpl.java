@@ -29,7 +29,6 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -96,11 +95,10 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         //写入数据库
         int i = aqiFeedbackMapper.insert(aqiFeedback);
         //判断是否是前500条记录，如果是则写入缓存，否则不写入
-        if (i == 1) {
-            if (aqiFeedbackMapper.selectCount(null) <= 500) {
+        if (i == 1 && aqiFeedbackMapper.selectCount(null) <= 500) {
                 aqiFeedbackRepository.saveFeedback(aqiFeedback);
             }
-        }
+
         return i == 1;
     }
 
@@ -111,7 +109,6 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
      * @return 是否成功
      */
     @Override
-    // TODO 分布式事务 异步情况
     public Boolean submitFeedback(AqiFeedbackDTO aqiFeedbackDTO) {
         //获取当前时间
         long current = DateUtil.current();
@@ -150,20 +147,9 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
             feedbackList = feedbackPage.getRecords();
             total = feedbackPage.getTotal();
         }
-//        LambdaQueryWrapper<AqiFeedback> wrapper = new LambdaQueryWrapper<>();
-//        wrapper.eq(AqiFeedback::getTelId, telId);
-//        Page<AqiFeedback> aqiFeedbackPage = new Page<>(page, size);
-//        IPage<AqiFeedback> aqiFeedbackList = aqiFeedbackMapper.selectPage(aqiFeedbackPage, wrapper);
-
         // 使用 CompletableFuture 并行处理每个反馈记录
         List<AqiFeedBackVO> feedbackFullDTOList = getAqiFeedBackVOS(feedbackList);
 
-        // 构造并返回包含完整 DTO 数据的分页结果
-//        IPage<AqiFeedBackDTO> feedbackFullDTOPage = new Page<>(page, size);
-//        feedbackFullDTOPage.setRecords(feedbackFullDTOList);
-//        feedbackFullDTOPage.setTotal(aqiFeedbackList.getTotal());
-//        feedbackFullDTOPage.setCurrent(aqiFeedbackList.getCurrent());
-//        feedbackFullDTOPage.setSize(aqiFeedbackList.getSize());
         // 构造并返回包含完整DTO数据的分页结果
         IPage<AqiFeedBackVO> feedbackDTOPage = new Page<>(page, size, total);
         feedbackDTOPage.setTotal(total);
@@ -263,9 +249,11 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
                 ).toList();
 
         // 将所有 CompletableFuture 的结果收集到一个列表中
-        List<AqiFeedBackVO> feedbackFullDTOList = futures.stream()
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
+        List<AqiFeedBackVO> feedbackFullDTOList = new ArrayList<>();
+        for (CompletableFuture<AqiFeedBackVO> future : futures) {
+            AqiFeedBackVO join = future.join();
+            feedbackFullDTOList.add(join);
+        }
         return feedbackFullDTOList;
     }
 
@@ -301,22 +289,11 @@ public class AqiFeedbackServiceImpl extends ServiceImpl<AqiFeedbackMapper, AqiFe
         aqiFeedback.setState(1);
         //更新feedback记录
         int i = aqiFeedbackMapper.updateById(aqiFeedback);
-//        //去除不必要的字段
-//        assignDTO.setAfId(null);
-//        //设置网格地址
-//        assignDTO.setAddress(aqiFeedback.getAddress());
-        //不强制执行指派，由网格员自己决定是否接受指派，指派会在玩个圆名下处于待执行状态
-//        //远程调用user-server,指派任务
-//        boolean assignTask = userClient.assignGridManager(assignDTO).getData();
-//        if (!assignTask) {
-//            throw new RuntimeException("指派任务失败");
-//        }
         //判断是否是前500条记录，如果是则写入缓存，否则不写入
-        if (i == 1) {
-            if (aqiFeedbackMapper.selectCount(null) <= 500) {
+        if (i == 1 && aqiFeedbackMapper.selectCount(null) <= 500) {
                 aqiFeedbackRepository.updateFeedbackData(aqiFeedback);
             }
-        }
+
         NotifyDTO notifyDTO = new NotifyDTO();
         notifyDTO.setRequireRefresh(true);
         notifyDTO.setMsg("反馈成功");
